@@ -1,0 +1,74 @@
+body,
+html {
+    font-family: var(--vscode-font-family) !important;
+    font-size: var(--vscode-font-size) !important;
+    font-weight: var(--vscode-font-weight) !important;
+    background: var(--vscode-sidebar-background) !important;
+    height: 100%;
+    color: var(--vscode-editor-foreground) !important;
+}
+.contentRoot {
+    height: 100%;
+}
+
+.sidenav {
+    height: 100%; /* Full-height: remove this if you want "auto" height */
+    width: 160px; /* Set the width of the sidebar */
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    left: 0;
+    background-color: var(--vscode-editorGroupHeader-tabsBackground);
+    border: 1px solid var(--vscode-editorGroupHeader-tabsBorder);
+    border-right: 2px solid var(--vscode-tab-border) !important;
+    overflow-x: hidden; /* Disable horizontal scroll */
+}
+.main {
+    margin-left: 140px;
+    margin-right: -20px;
+    height: 100%;
+}
+.btn {
+    background-color: var(--vscode-button-background) !important;
+    color: var(--vscode-button-foreground) !important;
+    border-radius: 0px !important;
+    width: 100% !important;
+    margin-bottom: 5px !important;
+    height: 27px !important;
+    padding-top: 2px !important;
+}
+.btn:hover {
+    background-color: var(--vscode-button-hoverBackground) !important;
+    color: var(--vscode-button-foreground) !important;
+}
+.field {
+    margin-bottom: 5px;
+}
+.field-label {
+    display: inline-block;
+    width: 75px;
+}
+.form-control {
+    display: inline-block !important;
+    width: calc(100% - 80px);
+}
+.change-btn {
+    float: right;
+    margin-top: -4px;
+    margin-right: -7px;
+}
+h6 {
+    font-size: var(--vscode-font-size);
+    font-weight: var(--vscode-font-weight);
+}
+select {
+    background: var(--vscode-dropdown-background) !important;
+    border: 1px solid var(--vscode-dropdown-border) !important;
+    color: var(--vscode-dropdown-foreground) !important;
+    border-radius: 0px !important;
+}
+.progress {
+    width: calc(100% - 80px);
+    display: inline-block;
+    height: 8px;
+}

@@ -1,0 +1,138 @@
+<button type="button" class="btn startLoggingButton" onclick="startLogging()">Start Logging</button>
+
+<button
+    type="button"
+    class="btn pendingButton hidden"
+    style="width: 100%; margin-bottom: 5px"
+    disabled
+>
+    Please Wait...
+</button>
+<button
+    type="button"
+    class="btn stopLoggingButton hidden"
+    style="width: 100%; margin-bottom: 5px"
+    onclick="stopLogging()"
+>
+    Stop Logging
+</button>
+
+<div class="field">
+    <h6 class="field-label">Log Usage</h6>
+    <div class="progress">
+        <div
+            class="progress-bar progress-bar-striped progress-bar-animated"
+            role="progressbar"
+            style="width: 100%"
+            aria-valuenow="100"
+            aria-valuemin="0"
+            aria-valuemax="100"
+        >
+            &nbsp;
+        </div>
+    </div>
+</div>
+<div class="field">
+    <h6 class="field-label">Apex Code</h6>
+    <select class="form-control form-control-sm" id="apex">
+        <option>NONE</option>
+        <option>ERROR</option>
+        <option>WARN</option>
+        <option>INFO</option>
+        <option>DEBUG</option>
+        <option>FINE</option>
+        <option>FINER</option>
+        <option>FINEST</option>
+    </select>
+</div>
+<div class="field">
+    <h6 class="field-label">Profiling</h6>
+    <select class="form-control form-control-sm" id="profiling">
+        <option>NONE</option>
+        <option>ERROR</option>
+        <option>WARN</option>
+        <option>INFO</option>
+        <option>DEBUG</option>
+        <option>FINE</option>
+        <option>FINER</option>
+        <option>FINEST</option>
+    </select>
+</div>
+<div class="field">
+    <h6 class="field-label">Callout</h6>
+    <select class="form-control form-control-sm" id="callout">
+        <option>NONE</option>
+        <option>ERROR</option>
+        <option>WARN</option>
+        <option>INFO</option>
+        <option>DEBUG</option>
+        <option>FINE</option>
+        <option>FINER</option>
+        <option>FINEST</option>
+    </select>
+</div>
+<div class="field">
+    <h6 class="field-label">Database</h6>
+    <select class="form-control form-control-sm" id="database">
+        <option>NONE</option>
+        <option>ERROR</option>
+        <option>WARN</option>
+        <option>INFO</option>
+        <option>DEBUG</option>
+        <option>FINE</option>
+        <option>FINER</option>
+        <option>FINEST</option>
+    </select>
+</div>
+<div class="field">
+    <h6 class="field-label">System</h6>
+    <select class="form-control form-control-sm" id="system">
+        <option>NONE</option>
+        <option>ERROR</option>
+        <option>WARN</option>
+        <option>INFO</option>
+        <option>DEBUG</option>
+        <option>FINE</option>
+        <option>FINER</option>
+        <option>FINEST</option>
+    </select>
+</div>
+<div class="field">
+    <h6 class="field-label">Validation</h6>
+    <select class="form-control form-control-sm" id="validation">
+        <option>NONE</option>
+        <option>ERROR</option>
+        <option>WARN</option>
+        <option>INFO</option>
+        <option>DEBUG</option>
+        <option>FINE</option>
+        <option>FINER</option>
+        <option>FINEST</option>
+    </select>
+</div>
+<div class="field">
+    <h6 class="field-label">Visualforce</h6>
+    <select class="form-control form-control-sm" id="visualforce">
+        <option>NONE</option>
+        <option>ERROR</option>
+        <option>WARN</option>
+        <option>INFO</option>
+        <option>DEBUG</option>
+        <option>FINE</option>
+        <option>FINER</option>
+        <option>FINEST</option>
+    </select>
+</div>
+<div class="field">
+    <h6 class="field-label">Workflow</h6>
+    <select class="form-control form-control-sm" id="workflow">
+        <option>NONE</option>
+        <option>ERROR</option>
+        <option>WARN</option>
+        <option>INFO</option>
+        <option>DEBUG</option>
+        <option>FINE</option>
+        <option>FINER</option>
+        <option>FINEST</option>
+    </select>
+</div>
