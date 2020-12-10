@@ -1,6 +1,7 @@
-# Apex Logs
+# Apex Log Profiler & Analyzer
 
-Apex Logs is a tool used to easily profile apex logs and quicky kick off debugging sessions
+Quickly profile and analyze Salesforce logs.
+![GitHub Logo](./ui/media/ApexLogs.gif)
 
 ## Features
 

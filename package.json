@@ -1,12 +1,30 @@
 {
 	"name": "apex-logs",
-	"displayName": "apex-logs",
-	"description": "",
+	"displayName": "Apex Logs - Log Profiling & Analysis",
+	"description": "Profile & Analyze Apex Logs Directly in VSCode!",
 	"version": "0.1.0",
 	"publisher": "forcecreators",
+	"license": "MIT License",
+	"preview": true,
+	"icon": "./ui/media/ApexLogs.jpeg",
+	"keywords": [
+		"Salesforce",
+		"Apex",
+		"Log",
+		"Profiler",
+		"Analyzer",
+		"Debugging",
+		"Logging",
+		"Limits",
+		"Visual",
+		"Profiling"
+	],
 	"engines": {
 		"vscode": "^1.51.0"
 	},
+	"extensionDependencies": [
+		"salesforce.salesforcedx-vscode"
+	],
 	"categories": [
 		"Other"
 	],
