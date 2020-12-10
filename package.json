@@ -6,7 +6,7 @@
 	"publisher": "forcecreators",
 	"license": "MIT License",
 	"preview": true,
-	"icon": "./ui/media/ApexLogs.jpeg",
+	"icon": "https://raw.githubusercontent.com/forcecreators/apex-logs/master/ui/media/ApexLogs.jpeg",
 	"keywords": [
 		"Salesforce",
 		"Apex",
