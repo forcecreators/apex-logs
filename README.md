@@ -1,7 +1,7 @@
 # Apex Log Profiler & Analyzer
 
 Quickly profile and analyze Salesforce logs.
-![GitHub Logo](./ui/media/ApexLogs.gif)
+![GitHub Logo](https://raw.githubusercontent.com/forcecreators/apex-logs/master/ui/media/ApexLogs.gif)
 
 ## Features
 
