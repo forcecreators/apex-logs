@@ -41,18 +41,21 @@ exports.save = save;
 function setup(context) {
     return __awaiter(this, void 0, void 0, function* () {
         const config = get(context);
-        if (Object.keys(config.defaultUser).length == 2)
-            return;
-        if (Object.keys(config.orgs).length == 0)
+        const defaultOrg = getDefaultOrg();
+        if (!config.orgs ||
+            !config.defaultOrg ||
+            !config.orgs[defaultOrg] ||
+            config.defaultOrg !== defaultOrg) {
+            //todo: stop debugging
+            config.defaultOrg = defaultOrg;
             yield updateOrgs(config, context);
-        if (!config.defaultOrg)
-            config.defaultOrg = getDefaultOrg();
-        //todo: check if default org changed
-        if (!config.defaultUser.username)
             config.defaultUser.username = config.orgs[getDefaultOrg()].username;
-        if (!config.defaultUser.id)
             yield getUserId(config, context);
-        save(config, context);
+            save(config, context);
+        }
+        fs.watchFile(path.join(getWorkspaceFolder(), ".sfdx", "sfdx-config.json"), () => {
+            setup(context);
+        });
     });
 }
 exports.setup = setup;

@@ -30,15 +30,23 @@ export function save(newConfig: ExtensionConfig, context: vscode.ExtensionContex
 
 export async function setup(context: vscode.ExtensionContext) {
     const config = get(context);
-    if (Object.keys(config.defaultUser).length == 2) return;
-
-    if (Object.keys(config.orgs).length == 0) await updateOrgs(config, context);
-    if (!config.defaultOrg) config.defaultOrg = getDefaultOrg();
-    //todo: check if default org changed
-    if (!config.defaultUser.username)
+    const defaultOrg = getDefaultOrg();
+    if (
+        !config.orgs ||
+        !config.defaultOrg ||
+        !config.orgs[defaultOrg] ||
+        config.defaultOrg !== defaultOrg
+    ) {
+        //todo: stop debugging
+        config.defaultOrg = defaultOrg;
+        await updateOrgs(config, context);
         config.defaultUser.username = config.orgs[getDefaultOrg()].username;
-    if (!config.defaultUser.id) await getUserId(config, context);
-    save(config, context);
+        await getUserId(config, context);
+        save(config, context);
+    }
+    fs.watchFile(path.join(getWorkspaceFolder(), ".sfdx", "sfdx-config.json"), () => {
+        setup(context);
+    });
 }
 
 export function getPath(context: vscode.ExtensionContext) {
