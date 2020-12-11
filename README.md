@@ -12,11 +12,11 @@ limits consumption.
 -   Visualize and interact with your codes stack tace to easily find bottlenecks
 -   Visualize your codes limits consumption with easy to read graphs.
 
-## Known Issues
-
-The `FLOW_START_INTERVIEW_LIMIT_USAGE` may break the apex log profiler. Use Workflow `INFO` if log profiles fail to render.
-
 ## Release Notes
+
+### 0.1.3
+
+Bug Fix: The `FLOW_START_INTERVIEW_LIMIT_USAGE` may break the apex log profiler. Profiler will work regardless of `WORKFLOW` log levels.
 
 ### 0.1.2
 
