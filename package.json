@@ -2,7 +2,7 @@
 	"name": "apex-logs",
 	"displayName": "Apex Logs - Log Profiling & Analysis",
 	"description": "Profile & Analyze Apex Logs Directly in VSCode!",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"publisher": "forcecreators",
 	"license": "MIT License",
 	"preview": true,

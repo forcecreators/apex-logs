@@ -2,6 +2,10 @@
 
 All notable changes to the "apex-logs" extension will be documented in this file.
 
-## Version 0.1.0
+### 0.1.2
 
--   Initial release
+Bug Fix: Extension will not start debugging if user changes their workspace default org.
+
+### 0.1.0
+
+Initial Release
