@@ -11,8 +11,19 @@ function command(command, args) {
             cwd: apexlog.config.getWorkspaceFolder(),
         });
         ls.stdout.on("data", function (data) {
-            const response = JSON.parse(data.toString());
-            resolve(response);
+            let response;
+            try {
+                response = JSON.parse(data.toString());
+            }
+            catch (e) {
+                reject(e.message);
+            }
+            if (response.status === 0) {
+                resolve(response);
+            }
+            else {
+                reject(response);
+            }
         });
     });
 }

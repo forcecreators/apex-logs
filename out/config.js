@@ -14,6 +14,7 @@ const fs = require("fs");
 const path = require("path");
 const vscode = require("vscode");
 const cp = require("child_process");
+const apexlog = require("./apexlog");
 exports.CONFIG_NAME = "config.json";
 function get(context) {
     const configPath = path.join(context.extensionPath, exports.CONFIG_NAME);
@@ -46,13 +47,21 @@ function setup(context) {
             !config.defaultOrg ||
             !config.orgs[defaultOrg] ||
             config.defaultOrg !== defaultOrg) {
-            //todo: stop debugging
             config.defaultOrg = defaultOrg;
             yield updateOrgs(config, context);
             config.defaultUser.username = config.orgs[getDefaultOrg()].username;
             yield getUserId(config, context);
-            save(config, context);
         }
+        const traceFlag = yield apexlog.explorer.getActiveTraceFlag(context);
+        if (traceFlag) {
+            config.traceFlagId = traceFlag.Id;
+            config.endTime = new Date(traceFlag.ExpirationDate).getTime();
+        }
+        else {
+            config.traceFlagId = null;
+            config.endTime = null;
+        }
+        save(config, context);
         fs.watchFile(path.join(getWorkspaceFolder(), ".sfdx", "sfdx-config.json"), () => {
             setup(context);
         });
