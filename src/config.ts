@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import * as cp from "child_process";
+import * as apexlog from "./apexlog";
 
 export const CONFIG_NAME = "config.json";
 
@@ -30,15 +31,30 @@ export function save(newConfig: ExtensionConfig, context: vscode.ExtensionContex
 
 export async function setup(context: vscode.ExtensionContext) {
     const config = get(context);
-    if (Object.keys(config.defaultUser).length == 2) return;
-
-    if (Object.keys(config.orgs).length == 0) await updateOrgs(config, context);
-    if (!config.defaultOrg) config.defaultOrg = getDefaultOrg();
-    //todo: check if default org changed
-    if (!config.defaultUser.username)
+    const defaultOrg = getDefaultOrg();
+    if (
+        !config.orgs ||
+        !config.defaultOrg ||
+        !config.orgs[defaultOrg] ||
+        config.defaultOrg !== defaultOrg
+    ) {
+        config.defaultOrg = defaultOrg;
+        await updateOrgs(config, context);
         config.defaultUser.username = config.orgs[getDefaultOrg()].username;
-    if (!config.defaultUser.id) await getUserId(config, context);
+        await getUserId(config, context);
+    }
+    const traceFlag: any = await apexlog.explorer.getActiveTraceFlag(context);
+    if (traceFlag) {
+        config.traceFlagId = traceFlag.Id;
+        config.endTime = new Date(traceFlag.ExpirationDate).getTime();
+    } else {
+        config.traceFlagId = null;
+        config.endTime = null;
+    }
     save(config, context);
+    fs.watchFile(path.join(getWorkspaceFolder(), ".sfdx", "sfdx-config.json"), () => {
+        setup(context);
+    });
 }
 
 export function getPath(context: vscode.ExtensionContext) {

@@ -2,11 +2,15 @@
 	"name": "apex-logs",
 	"displayName": "Apex Logs - Log Profiling & Analysis",
 	"description": "Profile & Analyze Apex Logs Directly in VSCode!",
-	"version": "0.1.0",
+	"version": "0.1.3",
 	"publisher": "forcecreators",
 	"license": "MIT License",
 	"preview": true,
-	"icon": "./ui/media/ApexLogs.jpeg",
+	"icon": "ui/media/ApexLogs.jpeg",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/forcecreators/apex-logs.git"
+	  },
 	"keywords": [
 		"Salesforce",
 		"Apex",

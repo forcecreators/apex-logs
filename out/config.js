@@ -14,6 +14,7 @@ const fs = require("fs");
 const path = require("path");
 const vscode = require("vscode");
 const cp = require("child_process");
+const apexlog = require("./apexlog");
 exports.CONFIG_NAME = "config.json";
 function get(context) {
     const configPath = path.join(context.extensionPath, exports.CONFIG_NAME);
@@ -41,18 +42,29 @@ exports.save = save;
 function setup(context) {
     return __awaiter(this, void 0, void 0, function* () {
         const config = get(context);
-        if (Object.keys(config.defaultUser).length == 2)
-            return;
-        if (Object.keys(config.orgs).length == 0)
+        const defaultOrg = getDefaultOrg();
+        if (!config.orgs ||
+            !config.defaultOrg ||
+            !config.orgs[defaultOrg] ||
+            config.defaultOrg !== defaultOrg) {
+            config.defaultOrg = defaultOrg;
             yield updateOrgs(config, context);
-        if (!config.defaultOrg)
-            config.defaultOrg = getDefaultOrg();
-        //todo: check if default org changed
-        if (!config.defaultUser.username)
             config.defaultUser.username = config.orgs[getDefaultOrg()].username;
-        if (!config.defaultUser.id)
             yield getUserId(config, context);
+        }
+        const traceFlag = yield apexlog.explorer.getActiveTraceFlag(context);
+        if (traceFlag) {
+            config.traceFlagId = traceFlag.Id;
+            config.endTime = new Date(traceFlag.ExpirationDate).getTime();
+        }
+        else {
+            config.traceFlagId = null;
+            config.endTime = null;
+        }
         save(config, context);
+        fs.watchFile(path.join(getWorkspaceFolder(), ".sfdx", "sfdx-config.json"), () => {
+            setup(context);
+        });
     });
 }
 exports.setup = setup;

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.downloadLog = exports.stopLogging = exports.startLoopingRefresh = exports.startLogging = exports.refreshLogs = exports.getLogUsage = exports.remotelogs = exports.controlpanel = void 0;
+exports.getActiveTraceFlag = exports.downloadLog = exports.stopLogging = exports.startLoopingRefresh = exports.startLogging = exports.refreshLogs = exports.getLogUsage = exports.remotelogs = exports.controlpanel = void 0;
 const _controlpanel = require("./explorer/controlpanel");
 const _remotelogs = require("./explorer/remotelogs");
 const vscode = require("vscode");
@@ -42,25 +42,26 @@ function refreshLogs(context) {
 }
 exports.refreshLogs = refreshLogs;
 function startLogging(context) {
-    return __awaiter(this, void 0, void 0, function* () {
-        vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: "Starting Logging Session",
-            cancellable: true,
-        }, (progress, token) => __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-                const config = apexlog.config.get(context);
-                const endtime = new Date().getTime() + 60000 * config.maxTimeMin;
-                const debugLevelId = yield getDebugLevelId(config, context);
-                const traceFlagId = yield createTraceFlag(debugLevelId, new Date().getTime(), endtime, config, context);
-                config.endTime = endtime;
-                config.traceFlagId = traceFlagId;
-                apexlog.config.save(config, context);
-                startLoopingRefresh(context);
-                resolve();
-            }));
-        }));
-    });
+    vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: "Starting Logging Session",
+        cancellable: true,
+    }, () => __awaiter(this, void 0, void 0, function* () {
+        try {
+            const config = apexlog.config.get(context);
+            const endtime = new Date().getTime() + 60000 * config.maxTimeMin;
+            const debugLevelId = yield getDebugLevelId(config, context);
+            const traceFlagId = yield createTraceFlag(debugLevelId, new Date().getTime(), endtime, config, context);
+            config.endTime = endtime;
+            config.traceFlagId = traceFlagId;
+            apexlog.config.save(config, context);
+            startLoopingRefresh(context);
+            return;
+        }
+        catch (e) {
+            vscode.window.showErrorMessage("Unable to start logging: " + e.message);
+        }
+    }));
 }
 exports.startLogging = startLogging;
 function startLoopingRefresh(context) {
@@ -81,7 +82,13 @@ function stopLogging(context) {
         title: "Stopping Logging Session",
         cancellable: false,
     }, (progress, token) => __awaiter(this, void 0, void 0, function* () {
-        return yield deleteTraceFlag(context);
+        try {
+            return yield deleteTraceFlag(context);
+        }
+        catch (e) {
+            vscode.window.showErrorMessage("Unable to stop logging: " + e.message);
+            return;
+        }
     }));
 }
 exports.stopLogging = stopLogging;
@@ -121,11 +128,41 @@ function deleteTraceFlag(context) {
             config.traceFlagId = null;
             apexlog.config.save(config, context);
             resolve();
+        })
+            .catch((error) => {
+            reject(error);
         });
     });
 }
+function getActiveTraceFlag(context) {
+    return new Promise((resolve, reject) => {
+        const config = apexlog.config.get(context);
+        apexlog.sfdx
+            .command("force:data:soql:query", [
+            "-t",
+            "-q",
+            "SELECT Id, ExpirationDate FROM TraceFlag WHERE ExpirationDate > " +
+                new Date().toISOString() +
+                " AND TracedEntityId='" +
+                config.defaultUser.id +
+                "' ",
+        ])
+            .then((response) => {
+            if (response.result.size === 1) {
+                resolve(response.result.records[0]);
+            }
+            else {
+                resolve(null);
+            }
+        })
+            .catch((error) => {
+            reject(error);
+        });
+    });
+}
+exports.getActiveTraceFlag = getActiveTraceFlag;
 function createTraceFlag(debugLevelId, startDate, expirationDate, config, context) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         const values = "LogType='DEVELOPER_LOG' " +
             "DebugLevelId='" +
             debugLevelId +
@@ -143,6 +180,9 @@ function createTraceFlag(debugLevelId, startDate, expirationDate, config, contex
             .command("force:data:record:create", ["-t", "-s", "TraceFlag", "-v", values])
             .then((response) => {
             resolve(response.result.id);
+        })
+            .catch((error) => {
+            reject(error);
         });
     });
 }
@@ -160,9 +200,14 @@ function getDebugLevelId(config, context) {
         else {
             command = "force:data:record:create";
         }
-        return new Promise((resolve) => {
-            apexlog.sfdx.command(command, commandValues).then((response) => {
+        return new Promise((resolve, reject) => {
+            apexlog.sfdx
+                .command(command, commandValues)
+                .then((response) => {
                 resolve(response.result.id);
+            })
+                .catch((error) => {
+                reject(error);
             });
         });
     });

@@ -1,22 +1,26 @@
 # Apex Log Profiler & Analyzer
 
-Quickly profile and analyze Salesforce logs.
-![GitHub Logo](./ui/media/ApexLogs.gif)
+Quickly profile and analyze Salesforce logs with Apex Logs. Apex Logs offers developers the ability to easily visualize their codes execution and see meaningful
+information about the transaction. Developers can utilize the interactive stack trace to see why trasactions are running slow, or visualize their codes
+limits consumption.
+![GitHub Logo](https://raw.githubusercontent.com/forcecreators/apex-logs/master/ui/media/ApexLogs.gif)
 
 ## Features
 
--   Setup a logging session with a single click
--   View remote server logs
--   View a logs execution stack/executed units
--   View a logs limit usage with graphs
-
-## Known Issues
-
-The `FLOW_START_INTERVIEW_LIMIT_USAGE` may break the apex log profiler
+-   Start a logging session with a single click
+-   See available logs directly in VSCode
+-   Visualize and interact with your codes stack tace to easily find bottlenecks
+-   Visualize your codes limits consumption with easy to read graphs.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.1.3
+
+Bug Fix: The `FLOW_START_INTERVIEW_LIMIT_USAGE` may break the apex log profiler. Profiler will work regardless of `WORKFLOW` log levels.
+
+### 0.1.2
+
+Bug Fix: Extension will not start debugging if user changes their workspace default org.
 
 ### 0.1.0
 

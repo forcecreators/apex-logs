@@ -34,15 +34,15 @@ export async function refreshLogs(context: vscode.ExtensionContext) {
     });
 }
 
-export async function startLogging(context: vscode.ExtensionContext) {
+export function startLogging(context: vscode.ExtensionContext) {
     vscode.window.withProgress(
         {
             location: vscode.ProgressLocation.Notification,
             title: "Starting Logging Session",
             cancellable: true,
         },
-        async (progress, token) => {
-            return new Promise(async (resolve: any, reject) => {
+        async () => {
+            try {
                 const config = apexlog.config.get(context);
                 const endtime = new Date().getTime() + 60000 * config.maxTimeMin;
                 const debugLevelId: any = await getDebugLevelId(config, context);
@@ -58,8 +58,10 @@ export async function startLogging(context: vscode.ExtensionContext) {
                 apexlog.config.save(config, context);
 
                 startLoopingRefresh(context);
-                resolve();
-            });
+                return;
+            } catch (e) {
+                vscode.window.showErrorMessage("Unable to start logging: " + e.message);
+            }
         }
     );
 }
@@ -81,7 +83,12 @@ export function stopLogging(context: vscode.ExtensionContext) {
             cancellable: false,
         },
         async (progress, token) => {
-            return await deleteTraceFlag(context);
+            try {
+                return await deleteTraceFlag(context);
+            } catch (e) {
+                vscode.window.showErrorMessage("Unable to stop logging: " + e.message);
+                return;
+            }
         }
     );
 }
@@ -135,6 +142,35 @@ function deleteTraceFlag(context: vscode.ExtensionContext) {
                 config.traceFlagId = null;
                 apexlog.config.save(config, context);
                 resolve();
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
+}
+
+export function getActiveTraceFlag(context: vscode.ExtensionContext) {
+    return new Promise((resolve, reject) => {
+        const config = apexlog.config.get(context);
+        apexlog.sfdx
+            .command("force:data:soql:query", [
+                "-t",
+                "-q",
+                "SELECT Id, ExpirationDate FROM TraceFlag WHERE ExpirationDate > " +
+                    new Date().toISOString() +
+                    " AND TracedEntityId='" +
+                    config.defaultUser.id +
+                    "' ",
+            ])
+            .then((response: any) => {
+                if (response.result.size === 1) {
+                    resolve(response.result.records[0]);
+                } else {
+                    resolve(null);
+                }
+            })
+            .catch((error) => {
+                reject(error);
             });
     });
 }
@@ -146,7 +182,7 @@ function createTraceFlag(
     config: ExtensionConfig,
     context: vscode.ExtensionContext
 ): any {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         const values =
             "LogType='DEVELOPER_LOG' " +
             "DebugLevelId='" +
@@ -165,6 +201,9 @@ function createTraceFlag(
             .command("force:data:record:create", ["-t", "-s", "TraceFlag", "-v", values])
             .then((response: any) => {
                 resolve(response.result.id);
+            })
+            .catch((error) => {
+                reject(error);
             });
     });
 }
@@ -181,10 +220,15 @@ async function getDebugLevelId(config: ExtensionConfig, context: vscode.Extensio
     } else {
         command = "force:data:record:create";
     }
-    return new Promise((resolve) => {
-        apexlog.sfdx.command(command, commandValues).then((response: any) => {
-            resolve(response.result.id);
-        });
+    return new Promise((resolve, reject) => {
+        apexlog.sfdx
+            .command(command, commandValues)
+            .then((response: any) => {
+                resolve(response.result.id);
+            })
+            .catch((error) => {
+                reject(error);
+            });
     });
 }
 
