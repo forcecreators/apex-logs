@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import * as cp from "child_process";
+import * as apexlog from "./apexlog";
 
 export const CONFIG_NAME = "config.json";
 
@@ -37,13 +38,20 @@ export async function setup(context: vscode.ExtensionContext) {
         !config.orgs[defaultOrg] ||
         config.defaultOrg !== defaultOrg
     ) {
-        //todo: stop debugging
         config.defaultOrg = defaultOrg;
         await updateOrgs(config, context);
         config.defaultUser.username = config.orgs[getDefaultOrg()].username;
         await getUserId(config, context);
-        save(config, context);
     }
+    const traceFlag: any = await apexlog.explorer.getActiveTraceFlag(context);
+    if (traceFlag) {
+        config.traceFlagId = traceFlag.Id;
+        config.endTime = new Date(traceFlag.ExpirationDate).getTime();
+    } else {
+        config.traceFlagId = null;
+        config.endTime = null;
+    }
+    save(config, context);
     fs.watchFile(path.join(getWorkspaceFolder(), ".sfdx", "sfdx-config.json"), () => {
         setup(context);
     });

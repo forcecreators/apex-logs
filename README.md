@@ -3,7 +3,7 @@
 Quickly profile and analyze Salesforce logs with Apex Logs. Apex Logs offers developers the ability to easily visualize their codes execution and see meaningful
 information about the transaction. Developers can utilize the interactive stack trace to see why trasactions are running slow, or visualize their codes
 limits consumption.
-![GitHub Logo](https://raw.githubusercontent.com/forcecreators/apex-logs/master/ui/media/ApexLogs.gif)
+![Apex Logs](https://raw.githubusercontent.com/forcecreators/apex-logs/master/ui/media/ApexLogs.gif)
 
 ## Features
 
@@ -13,6 +13,16 @@ limits consumption.
 -   Visualize your codes limits consumption with easy to read graphs.
 
 ## Release Notes
+
+### 0.1.4
+
+Bug Fix: Process builders show up under the "other" tab in "executed units" #20
+
+Bug Fix: Improve error handling for SFDX commands #14
+
+Bug Fix: Prevent blank screens when loading. Log Editor Provider to show information about profiling progress #23
+
+Bug Fix: Check for active trace flags when the extension starts #16
 
 ### 0.1.3
 
