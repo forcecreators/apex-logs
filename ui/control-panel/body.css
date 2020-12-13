@@ -67,8 +67,24 @@ select {
     color: var(--vscode-dropdown-foreground) !important;
     border-radius: 0px !important;
 }
+input {
+    background: var(--vscode-dropdown-background) !important;
+    border: 1px solid var(--vscode-dropdown-border) !important;
+    color: var(--vscode-dropdown-foreground) !important;
+    border-radius: 0px !important;
+}
 .progress {
     width: calc(100% - 80px);
     display: inline-block;
     height: 8px;
+}
+.nav-pills .nav-link.active {
+    background-color: var(--vscode-tab-activeBackground) !important;
+    color: var(--vscode-tab-activeForeground) !important;
+}
+.nav-pills .nav-link {
+    background-color: var(--vscode-tab-inactiveBackground) !important;
+    color: var(--vscode-tab-inactiveForeground) !important;
+    border-radius: 0px;
+    border-bottom: 2px solid var(--vscode-tab-border) !important;
 }
