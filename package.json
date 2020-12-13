@@ -1,7 +1,7 @@
 {
 	"name": "apex-logs",
-	"displayName": "Apex Logs - Log Profiling & Analysis",
-	"description": "Profile & Analyze Apex Logs Directly in VSCode!",
+	"displayName": "Apex Logs - Salesforce Performance Profiler",
+	"description": "Salesforce performance profiling directly in VSCode. Quickly and easily identify performance bottlenecks.",
 	"version": "0.1.4",
 	"publisher": "forcecreators",
 	"license": "MIT License",
@@ -22,14 +22,17 @@
 		"Limits",
 		"Visual",
 		"Profiling",
-		"Salesforce Logs",
-		"Salesforce Log Analyzer",
-		"Salesforce Log Profiling",
-		"Salesforce Log Profiler",
-		"Apex Logs",
-		"Apex Log Analyzer",
-		"Apex Log Profiling",
-		"Apex Log Profiler"
+		"Log Analyzer",
+		"Log Profiling",
+		"Log Profiler",
+		"Log Analyzer",
+		"Log Profiling",
+		"Log Profiler",
+		"Performance",
+		"Tool",
+		"Debugger",
+		"Bottleneck",
+		"Performance Profiler"
 	],
 	"engines": {
 		"vscode": "^1.51.0"
