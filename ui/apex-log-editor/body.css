@@ -1,14 +1,13 @@
-
 body,
 html {
     font-family: var(--vscode-font-family);
     font-size: var(--vscode-font-size);
     font-weight: var(--vscode-font-weight);
     background: var(--vscode-editor-background);
-    height:100%;
+    height: 100%;
 }
 .contentRoot {
-    height:100%;
+    height: 100%;
 }
 .CodeMirror {
     background: var(--vscode-editor-background) !important;
@@ -47,8 +46,8 @@ html {
 }
 .vis-background {
     display: none;
-    }
-.vis-item.vis-background{
+}
+.vis-item.vis-background {
     background-color: rgba(0, 0, 0, 0.02) !important;
 }
 .vis-label.vis-nested-group {
@@ -61,7 +60,7 @@ html {
 }
 .vis-labelset .vis-label .vis-inner {
     text-overflow: ellipsis;
-    max-width:400px;
+    max-width: 400px;
     color: var(--vscode-editor-foreground);
 }
 .vis-time-axis .vis-grid.vis-minor {
@@ -85,8 +84,8 @@ html {
 .main {
     margin-left: 140px;
     margin-right: -20px;
-    height:100%;
-    }
+    height: 100%;
+}
 .nav-pills .nav-link.active {
     background-color: var(--vscode-tab-activeBackground) !important;
     color: var(--vscode-tab-activeForeground) !important;
@@ -96,4 +95,66 @@ html {
     color: var(--vscode-tab-inactiveForeground) !important;
     border-radius: 0px;
     border-bottom: 2px solid var(--vscode-tab-border) !important;
+}
+.lds-ellipsis {
+    display: inline-block;
+    position: relative;
+    width: 70px;
+    height: 50px;
+}
+.lds-ellipsis div {
+    position: absolute;
+    top: 33px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--vscode-editor-foreground);
+    animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+.lds-ellipsis div:nth-child(1) {
+    left: 8px;
+    animation: lds-ellipsis1 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(2) {
+    left: 8px;
+    animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(3) {
+    left: 32px;
+    animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(4) {
+    left: 56px;
+    animation: lds-ellipsis3 0.6s infinite;
+}
+@keyframes lds-ellipsis1 {
+    0% {
+        transform: scale(0);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+@keyframes lds-ellipsis3 {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(0);
+    }
+}
+@keyframes lds-ellipsis2 {
+    0% {
+        transform: translate(0, 0);
+    }
+    100% {
+        transform: translate(24px, 0);
+    }
+}
+.rendering {
+    text-align: center;
+}
+.no-data {
+    text-align: center;
+    color: var(--vscode-editor-foreground);
 }
