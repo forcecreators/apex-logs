@@ -52,6 +52,7 @@ class ProfileService extends events.EventEmitter {
         profile["executionTree"] = this.renderExecutionTree(lines);
         profile["executedUnits"] = this.renderExecutedUnits(lines);
         profile["limits"] = this.renderLimits(metadata.limits);
+        profile["diagnostics"] = metadata.diagnostics;
         return profile;
     }
     renderLimits(limits) {

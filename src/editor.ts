@@ -20,6 +20,9 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
     }
 
     private static readonly viewType = "forcecreators.apexlogs.editor";
+    private diagnosticCollection: vscode.DiagnosticCollection | undefined;
+    private webviewPanel: vscode.WebviewPanel | undefined;
+    private document: vscode.TextDocument | undefined;
 
     constructor(private readonly context: vscode.ExtensionContext) {}
 
@@ -28,46 +31,27 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
         webviewPanel: vscode.WebviewPanel,
         _token: vscode.CancellationToken
     ): Promise<void> {
-        // Setup initial content for the webview
-        webviewPanel.webview.options = {
+        this.webviewPanel = webviewPanel;
+        this.document = document;
+        this.diagnosticCollection = vscode.languages.createDiagnosticCollection("ApexLog");
+
+        this.webviewPanel.webview.options = {
             enableScripts: true,
             localResourceRoots: [vscode.Uri.file(path.join(this.context.extensionPath, "ui"))],
         };
-        webviewPanel;
-        webviewPanel.webview.html = apexlog.ui.getWebviewContent(
+
+        this.webviewPanel.webview.html = apexlog.ui.getWebviewContent(
             "apex-log-editor",
-            webviewPanel.webview,
+            this.webviewPanel.webview,
             this.context
         );
 
-        function updateWebview() {
-            webviewPanel.webview.postMessage({
-                type: "update",
-                value: document.getText(),
-            });
-            apexlog.profiler.runProfiler(document.uri.fsPath).then((metadata) => {
-                console.log("got metadata!!!!");
-                console.log(metadata);
-                setTimeout(() => {
-                    webviewPanel.webview.postMessage({
-                        type: "profile",
-                        value: metadata,
-                    });
-                }, 3000);
-            });
-        }
-
-        const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument((e) => {
-            if (e.document.uri.toString() === document.uri.toString()) {
-                updateWebview();
-            }
-        });
-
-        webviewPanel.onDidDispose(() => {
+        this.webviewPanel.onDidDispose(() => {
             changeDocumentSubscription.dispose();
+            this.diagnosticCollection?.clear();
         });
 
-        webviewPanel.webview.onDidReceiveMessage((e) => {
+        this.webviewPanel.webview.onDidReceiveMessage((e) => {
             switch (e.type) {
                 case "debug":
                     //todo: wire up button to apex replay debugger
@@ -75,6 +59,48 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
             }
         });
 
-        updateWebview();
+        const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument((e) => {
+            if (e.document.uri.toString() === document.uri.toString()) {
+                this.updateWebview();
+            }
+        });
+
+        this.updateWebview();
+    }
+
+    public updateWebview(): void {
+        this.webviewPanel?.webview.postMessage({
+            type: "update",
+            value: this.document?.getText(),
+        });
+        if (!this.document) return;
+        apexlog.profiler.runProfiler(this.document.uri.fsPath).then((metadata: any) => {
+            if (this.document) {
+                this.diagnosticCollection?.set(
+                    this.document.uri,
+                    this.buildDiagnostics(metadata.diagnostics)
+                );
+            }
+            setTimeout(() => {
+                this.webviewPanel?.webview.postMessage({
+                    type: "profile",
+                    value: metadata,
+                });
+            }, 3000);
+        });
+    }
+
+    public buildDiagnostics(diagnostics: any) {
+        const results: any = [];
+        diagnostics.forEach((diagnosticItem: any) => {
+            results.push(
+                new vscode.Diagnostic(
+                    new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0)),
+                    diagnosticItem.message,
+                    diagnosticItem.severity
+                )
+            );
+        });
+        return results;
     }
 }

@@ -31,6 +31,7 @@ export class ApexLog extends events.EventEmitter {
     public startTime: number | null;
     public lines: any;
     public limits: any;
+    public diagnostics: any = [];
 
     private totalLines: number;
     private currentIndex: number;
@@ -66,6 +67,7 @@ export class ApexLog extends events.EventEmitter {
                 this.processLine(line);
                 this.reportProgess();
             }
+            this.buildLimitsDiagnostics();
             console.log("metadata", this);
             resolve(this);
         });
@@ -111,6 +113,14 @@ export class ApexLog extends events.EventEmitter {
     }
     public getCurrentIndex() {
         return this.currentIndex;
+    }
+    private buildLimitsDiagnostics() {
+        Object.keys(this.limits).forEach((key: string) => {
+            const limits = this.limits[key];
+            const limit = limits[limits.length - 1];
+            const message = `LIMIT ${key}: ${limit.limitCurrent}/${limit.limitMax}`;
+            this.diagnostics.push(new DiagnosticItem(2, message, limit));
+        });
     }
     private reportProgess() {
         const progress = Math.floor((this.currentIndex / this.totalLines) * 100);
@@ -198,5 +208,83 @@ export class ApexLogLine {
         }
         this.endTime = new Date(context.startTime + nanoToMili(endline.nano));
         this.totalTime = nanoToMili(endline.nano - this.nano);
+
+        if (this.type === "dml" && this.totalTime >= 3000 && this.totalTime < 8000) {
+            context.diagnostics.push(
+                new DiagnosticItem(
+                    1,
+                    `Long Running DML (${this.totalTime}ms): ${this.detail}`,
+                    this
+                )
+            );
+        } else if (this.type === "dml" && this.totalTime >= 8000) {
+            context.diagnostics.push(
+                new DiagnosticItem(
+                    0,
+                    `Long Running DML (${this.totalTime}ms): ${this.detail}`,
+                    this
+                )
+            );
+        } else if (this.type === "soql" && this.totalTime >= 1000 && this.totalTime < 8000) {
+            context.diagnostics.push(
+                new DiagnosticItem(
+                    1,
+                    `Long Running SOQL (${this.totalTime}ms): ${this.detail}`,
+                    this
+                )
+            );
+        } else if (this.type === "soql" && this.totalTime >= 8000) {
+            context.diagnostics.push(
+                new DiagnosticItem(
+                    0,
+                    `Long Running SOQL (${this.totalTime}ms): ${this.detail}`,
+                    this
+                )
+            );
+        } else if (this.type === "apex" && this.totalTime >= 1000 && this.totalTime < 8000) {
+            context.diagnostics.push(
+                new DiagnosticItem(
+                    1,
+                    `Long Running Apex (${this.totalTime}ms): ${this.detail}`,
+                    this
+                )
+            );
+        } else if (this.type === "apex" && this.totalTime >= 8000) {
+            context.diagnostics.push(
+                new DiagnosticItem(
+                    0,
+                    `Long Running Apex (${this.totalTime}ms): ${this.detail}`,
+                    this
+                )
+            );
+        } else if (this.type === "workflow" && this.totalTime >= 1000 && this.totalTime < 8000) {
+            context.diagnostics.push(
+                new DiagnosticItem(
+                    1,
+                    `Long Running Workflow (${this.totalTime}ms): ${this.detail}`,
+                    this
+                )
+            );
+        } else if (this.type === "workflow" && this.totalTime >= 8000) {
+            context.diagnostics.push(
+                new DiagnosticItem(
+                    0,
+                    `Long Running Workflow (${this.totalTime}ms): ${this.detail}`,
+                    this
+                )
+            );
+        }
+    }
+}
+
+class DiagnosticItem {
+    public severity: number;
+    public message: string;
+    public line: ApexLogLine;
+
+    constructor(severity: number, message: string, line: ApexLogLine) {
+        this.severity = severity;
+        this.message = message;
+        this.line = line;
     }
 }
