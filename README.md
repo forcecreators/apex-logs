@@ -1,16 +1,22 @@
 # Apex Log Profiler & Analyzer
 
-Quickly profile and analyze Salesforce logs with Apex Logs. Apex Logs offers developers the ability to easily visualize their codes execution and see meaningful
-information about the transaction. Developers can utilize the interactive stack trace to see why trasactions are running slow, or visualize their codes
-limits consumption.
+Salesforce performance profiling directly in VSCode. Quickly and easily identify performance bottlenecks or address runaway limits consumption. Visual stack traces make it easy to find exactly where and why transactions
 ![Apex Logs](https://raw.githubusercontent.com/forcecreators/apex-logs/master/ui/media/ApexLogs.gif)
 
 ## Features
 
--   Start a logging session with a single click
--   See available logs directly in VSCode
--   Visualize and interact with your codes stack tace to easily find bottlenecks
--   Visualize your codes limits consumption with easy to read graphs.
+-   Get profiling alerts directly in the VSCode "Problems" panel.
+    -   Limits consumption alerts
+    -   Long running query alerts
+    -   Trigger recursion alerts
+    -   Long running method alerts
+-   Traverse your logs visually with the visual stack trace to quickly find performance bottlenecks.
+-   Use the Executed Units tab to visualize your logs executed units quantitatively.
+-   See your limits consumption over time with graphs. Supports most limits.
+-   Start logging sessions quickly with a single click.
+-   Set logging levels directly from the UI
+-   Browse server logs directly from VSCode
+-   Delete server logs with a single click
 
 ## Release Notes
 
