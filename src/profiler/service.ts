@@ -14,16 +14,18 @@ export declare interface ProfileService extends events.EventEmitter {
 export class ProfileService extends events.EventEmitter {
     logpath: string;
     lastProgress: number;
+    config: any;
 
-    constructor(logpath: string) {
+    constructor(logpath: string, config: any) {
         super();
         this.logpath = logpath;
         this.lastProgress = 0;
+        this.config = config;
     }
 
     public run(): Promise<Object> {
         return new Promise<Object>((resolve) => {
-            new models.ApexLog(this.logpath)
+            new models.ApexLog(this.logpath, this.config)
                 .on("progress", (value: any) => {
                     this.reportProgress(value);
                 })

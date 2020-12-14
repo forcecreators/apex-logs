@@ -13,6 +13,7 @@ exports.ApexLogEditorProvider = void 0;
 const vscode = require("vscode");
 const path = require("path");
 const apexlog = require("./apexlog");
+const service_1 = require("./profiler/service");
 class ApexLogEditorProvider {
     constructor(context) {
         this.context = context;
@@ -58,24 +59,35 @@ class ApexLogEditorProvider {
     }
     updateWebview() {
         var _a, _b;
-        (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
-            type: "update",
-            value: (_b = this.document) === null || _b === void 0 ? void 0 : _b.getText(),
-        });
-        if (!this.document)
-            return;
-        apexlog.profiler.runProfiler(this.document.uri.fsPath).then((metadata) => {
-            var _a;
-            if (this.document) {
-                (_a = this.diagnosticCollection) === null || _a === void 0 ? void 0 : _a.set(this.document.uri, this.buildDiagnostics(metadata.diagnostics));
-            }
-            setTimeout(() => {
+        return __awaiter(this, void 0, void 0, function* () {
+            (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
+                type: "update",
+                value: (_b = this.document) === null || _b === void 0 ? void 0 : _b.getText(),
+            });
+            if (!this.document)
+                return;
+            const config = apexlog.config.get(this.context);
+            new service_1.ProfileService(this.document.uri.fsPath, config)
+                .on("progress", (value) => {
+                //progress
+            })
+                .on("debug", (value) => {
+                //debug
+            })
+                .run()
+                .then((metadata) => {
                 var _a;
-                (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
-                    type: "profile",
-                    value: metadata,
-                });
-            }, 3000);
+                if (this.document) {
+                    (_a = this.diagnosticCollection) === null || _a === void 0 ? void 0 : _a.set(this.document.uri, this.buildDiagnostics(metadata.diagnostics));
+                }
+                setTimeout(() => {
+                    var _a;
+                    (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
+                        type: "profile",
+                        value: metadata,
+                    });
+                }, 0);
+            });
         });
     }
     buildDiagnostics(diagnostics) {

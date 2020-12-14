@@ -37,8 +37,9 @@ export class ApexLog extends events.EventEmitter {
     private currentIndex: number;
     private lastProgress: number;
     public parents: Array<ApexLogLine>;
+    public config: any;
 
-    constructor(logpath: string) {
+    constructor(logpath: string, config: any) {
         super();
         this.logpath = logpath;
         this.startTime = null;
@@ -48,6 +49,7 @@ export class ApexLog extends events.EventEmitter {
         this.parents = [];
         this.lines = {};
         this.limits = {};
+        this.config = config;
     }
 
     public processLog() {
@@ -209,7 +211,11 @@ export class ApexLogLine {
         this.endTime = new Date(context.startTime + nanoToMili(endline.nano));
         this.totalTime = nanoToMili(endline.nano - this.nano);
 
-        if (this.type === "dml" && this.totalTime >= 3000 && this.totalTime < 8000) {
+        if (
+            this.type === "dml" &&
+            this.totalTime >= context.config.profileConfig.dmlWarn &&
+            this.totalTime < context.config.profileConfig.dmlError
+        ) {
             context.diagnostics.push(
                 new DiagnosticItem(
                     1,
@@ -217,7 +223,7 @@ export class ApexLogLine {
                     this
                 )
             );
-        } else if (this.type === "dml" && this.totalTime >= 8000) {
+        } else if (this.type === "dml" && this.totalTime >= context.config.profileConfig.dmlError) {
             context.diagnostics.push(
                 new DiagnosticItem(
                     0,
@@ -225,7 +231,11 @@ export class ApexLogLine {
                     this
                 )
             );
-        } else if (this.type === "soql" && this.totalTime >= 1000 && this.totalTime < 8000) {
+        } else if (
+            this.type === "soql" &&
+            this.totalTime >= context.config.profileConfig.soqlWarn &&
+            this.totalTime < context.config.profileConfig.soqlError
+        ) {
             context.diagnostics.push(
                 new DiagnosticItem(
                     1,
@@ -233,7 +243,10 @@ export class ApexLogLine {
                     this
                 )
             );
-        } else if (this.type === "soql" && this.totalTime >= 8000) {
+        } else if (
+            this.type === "soql" &&
+            this.totalTime >= context.config.profileConfig.soqlError
+        ) {
             context.diagnostics.push(
                 new DiagnosticItem(
                     0,
@@ -241,7 +254,11 @@ export class ApexLogLine {
                     this
                 )
             );
-        } else if (this.type === "apex" && this.totalTime >= 1000 && this.totalTime < 8000) {
+        } else if (
+            this.type === "apex" &&
+            this.totalTime >= context.config.profileConfig.apexWarn &&
+            this.totalTime < context.config.profileConfig.apexError
+        ) {
             context.diagnostics.push(
                 new DiagnosticItem(
                     1,
@@ -249,7 +266,10 @@ export class ApexLogLine {
                     this
                 )
             );
-        } else if (this.type === "apex" && this.totalTime >= 8000) {
+        } else if (
+            this.type === "apex" &&
+            this.totalTime >= context.config.profileConfig.apexError
+        ) {
             context.diagnostics.push(
                 new DiagnosticItem(
                     0,
@@ -257,7 +277,11 @@ export class ApexLogLine {
                     this
                 )
             );
-        } else if (this.type === "workflow" && this.totalTime >= 1000 && this.totalTime < 8000) {
+        } else if (
+            this.type === "workflow" &&
+            this.totalTime >= context.config.profileConfig.workflowWarn &&
+            this.totalTime < context.config.profileConfig.workflowError
+        ) {
             context.diagnostics.push(
                 new DiagnosticItem(
                     1,
@@ -265,7 +289,10 @@ export class ApexLogLine {
                     this
                 )
             );
-        } else if (this.type === "workflow" && this.totalTime >= 8000) {
+        } else if (
+            this.type === "workflow" &&
+            this.totalTime >= context.config.profileConfig.workflowError
+        ) {
             context.diagnostics.push(
                 new DiagnosticItem(
                     0,

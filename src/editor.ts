@@ -3,6 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { Worker } from "worker_threads";
 import * as apexlog from "./apexlog";
+import { ProfileService } from "./profiler/service";
 
 export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
     public static register(context: vscode.ExtensionContext): vscode.Disposable {
@@ -68,26 +69,35 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
         this.updateWebview();
     }
 
-    public updateWebview(): void {
+    public async updateWebview(): void {
         this.webviewPanel?.webview.postMessage({
             type: "update",
             value: this.document?.getText(),
         });
         if (!this.document) return;
-        apexlog.profiler.runProfiler(this.document.uri.fsPath).then((metadata: any) => {
-            if (this.document) {
-                this.diagnosticCollection?.set(
-                    this.document.uri,
-                    this.buildDiagnostics(metadata.diagnostics)
-                );
-            }
-            setTimeout(() => {
-                this.webviewPanel?.webview.postMessage({
-                    type: "profile",
-                    value: metadata,
-                });
-            }, 3000);
-        });
+        const config = apexlog.config.get(this.context);
+        new ProfileService(this.document.uri.fsPath, config)
+            .on("progress", (value) => {
+                //progress
+            })
+            .on("debug", (value) => {
+                //debug
+            })
+            .run()
+            .then((metadata: any) => {
+                if (this.document) {
+                    this.diagnosticCollection?.set(
+                        this.document.uri,
+                        this.buildDiagnostics(metadata.diagnostics)
+                    );
+                }
+                setTimeout(() => {
+                    this.webviewPanel?.webview.postMessage({
+                        type: "profile",
+                        value: metadata,
+                    });
+                }, 0);
+            });
     }
 
     public buildDiagnostics(diagnostics: any) {
