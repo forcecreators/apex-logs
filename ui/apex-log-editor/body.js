@@ -1,3 +1,5 @@
+const vscode = acquireVsCodeApi();
+
 let profile;
 let executionStackTimeline;
 let executedUnitsTimeline;
@@ -362,4 +364,8 @@ function renderRecordTypeDescribeLimits() {
         limitsRecordTypeDescribeGraph = new vis.Graph2d(container, dataset, options);
         limitsRecordTypeDescribeGraph.fit();
     }, 0);
+}
+
+function startDebugging() {
+    vscode.postMessage({ type: "debug" });
 }
