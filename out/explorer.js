@@ -134,9 +134,8 @@ function deleteTraceFlag(context) {
         });
     });
 }
-function getActiveTraceFlag(context) {
+function getActiveTraceFlag(config, context) {
     return new Promise((resolve, reject) => {
-        const config = apexlog.config.get(context);
         apexlog.sfdx
             .command("force:data:soql:query", [
             "-t",
