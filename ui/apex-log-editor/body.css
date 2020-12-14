@@ -158,3 +158,16 @@ html {
     text-align: center;
     color: var(--vscode-editor-foreground);
 }
+.btn {
+    background-color: var(--vscode-button-background) !important;
+    color: var(--vscode-button-foreground) !important;
+    border-radius: 0px !important;
+    width: 100% !important;
+    margin-bottom: 5px !important;
+    height: 27px !important;
+    padding-top: 2px !important;
+}
+.btn:hover {
+    background-color: var(--vscode-button-hoverBackground) !important;
+    color: var(--vscode-button-foreground) !important;
+}

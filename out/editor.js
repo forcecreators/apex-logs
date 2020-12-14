@@ -43,9 +43,10 @@ class ApexLogEditorProvider {
                 (_a = this.diagnosticCollection) === null || _a === void 0 ? void 0 : _a.clear();
             });
             this.webviewPanel.webview.onDidReceiveMessage((e) => {
+                var _a;
                 switch (e.type) {
                     case "debug":
-                        //todo: wire up button to apex replay debugger
+                        vscode.commands.executeCommand("sfdx.launch.replay.debugger.logfile", (_a = this.document) === null || _a === void 0 ? void 0 : _a.uri);
                         return;
                 }
             });

@@ -55,7 +55,10 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
         this.webviewPanel.webview.onDidReceiveMessage((e) => {
             switch (e.type) {
                 case "debug":
-                    //todo: wire up button to apex replay debugger
+                    vscode.commands.executeCommand(
+                        "sfdx.launch.replay.debugger.logfile",
+                        this.document?.uri
+                    );
                     return;
             }
         });
