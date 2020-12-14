@@ -13,9 +13,9 @@ exports.deactivate = exports.activate = void 0;
 const apexlog = require("./apexlog");
 function activate(context) {
     return __awaiter(this, void 0, void 0, function* () {
-        apexlog.editor.ApexLogEditorProvider.register(context);
         yield apexlog.config.setup(context);
         apexlog.registerCommands(context);
+        apexlog.editor.ApexLogEditorProvider.register(context);
         apexlog.explorer.remotelogs.RemoteLogsProvider.register(context);
         apexlog.explorer.controlpanel.ControlPanelProvider.register(context);
     });
