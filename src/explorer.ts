@@ -149,9 +149,8 @@ function deleteTraceFlag(context: vscode.ExtensionContext) {
     });
 }
 
-export function getActiveTraceFlag(context: vscode.ExtensionContext) {
+export function getActiveTraceFlag(config: any, context: vscode.ExtensionContext) {
     return new Promise((resolve, reject) => {
-        const config = apexlog.config.get(context);
         apexlog.sfdx
             .command("force:data:soql:query", [
                 "-t",

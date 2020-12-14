@@ -13,6 +13,7 @@ exports.ApexLogEditorProvider = void 0;
 const vscode = require("vscode");
 const path = require("path");
 const apexlog = require("./apexlog");
+const service_1 = require("./profiler/service");
 class ApexLogEditorProvider {
     constructor(context) {
         this.context = context;
@@ -28,46 +29,73 @@ class ApexLogEditorProvider {
     }
     resolveCustomTextEditor(document, webviewPanel, _token) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Setup initial content for the webview
-            webviewPanel.webview.options = {
+            this.webviewPanel = webviewPanel;
+            this.document = document;
+            this.diagnosticCollection = vscode.languages.createDiagnosticCollection("ApexLog");
+            this.webviewPanel.webview.options = {
                 enableScripts: true,
                 localResourceRoots: [vscode.Uri.file(path.join(this.context.extensionPath, "ui"))],
             };
-            webviewPanel;
-            webviewPanel.webview.html = apexlog.ui.getWebviewContent("apex-log-editor", webviewPanel.webview, this.context);
-            function updateWebview() {
-                webviewPanel.webview.postMessage({
-                    type: "update",
-                    value: document.getText(),
-                });
-                apexlog.profiler.runProfiler(document.uri.fsPath).then((metadata) => {
-                    console.log("got metadata!!!!");
-                    console.log(metadata);
-                    setTimeout(() => {
-                        webviewPanel.webview.postMessage({
-                            type: "profile",
-                            value: metadata,
-                        });
-                    }, 3000);
-                });
-            }
-            const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument((e) => {
-                if (e.document.uri.toString() === document.uri.toString()) {
-                    updateWebview();
-                }
-            });
-            webviewPanel.onDidDispose(() => {
+            this.webviewPanel.webview.html = apexlog.ui.getWebviewContent("apex-log-editor", this.webviewPanel.webview, this.context);
+            this.webviewPanel.onDidDispose(() => {
+                var _a;
                 changeDocumentSubscription.dispose();
+                (_a = this.diagnosticCollection) === null || _a === void 0 ? void 0 : _a.clear();
             });
-            webviewPanel.webview.onDidReceiveMessage((e) => {
+            this.webviewPanel.webview.onDidReceiveMessage((e) => {
                 switch (e.type) {
                     case "debug":
                         //todo: wire up button to apex replay debugger
                         return;
                 }
             });
-            updateWebview();
+            const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument((e) => {
+                if (e.document.uri.toString() === document.uri.toString()) {
+                    this.updateWebview();
+                }
+            });
+            this.updateWebview();
         });
+    }
+    updateWebview() {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
+                type: "update",
+                value: (_b = this.document) === null || _b === void 0 ? void 0 : _b.getText(),
+            });
+            if (!this.document)
+                return;
+            const config = apexlog.config.get(this.context);
+            new service_1.ProfileService(this.document.uri.fsPath, config)
+                .on("progress", (value) => {
+                //progress
+            })
+                .on("debug", (value) => {
+                //debug
+            })
+                .run()
+                .then((metadata) => {
+                var _a;
+                if (this.document) {
+                    (_a = this.diagnosticCollection) === null || _a === void 0 ? void 0 : _a.set(this.document.uri, this.buildDiagnostics(metadata.diagnostics));
+                }
+                setTimeout(() => {
+                    var _a;
+                    (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
+                        type: "profile",
+                        value: metadata,
+                    });
+                }, 0);
+            });
+        });
+    }
+    buildDiagnostics(diagnostics) {
+        const results = [];
+        diagnostics.forEach((diagnosticItem) => {
+            results.push(new vscode.Diagnostic(new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0)), diagnosticItem.message, diagnosticItem.severity));
+        });
+        return results;
     }
 }
 exports.ApexLogEditorProvider = ApexLogEditorProvider;

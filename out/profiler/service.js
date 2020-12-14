@@ -4,14 +4,15 @@ exports.ProfileService = void 0;
 const events = require("events");
 const models = require("../models");
 class ProfileService extends events.EventEmitter {
-    constructor(logpath) {
+    constructor(logpath, config) {
         super();
         this.logpath = logpath;
         this.lastProgress = 0;
+        this.config = config;
     }
     run() {
         return new Promise((resolve) => {
-            new models.ApexLog(this.logpath)
+            new models.ApexLog(this.logpath, this.config)
                 .on("progress", (value) => {
                 this.reportProgress(value);
             })
@@ -52,6 +53,7 @@ class ProfileService extends events.EventEmitter {
         profile["executionTree"] = this.renderExecutionTree(lines);
         profile["executedUnits"] = this.renderExecutedUnits(lines);
         profile["limits"] = this.renderLimits(metadata.limits);
+        profile["diagnostics"] = metadata.diagnostics;
         return profile;
     }
     renderLimits(limits) {
