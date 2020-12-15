@@ -50,6 +50,10 @@ export class ControlPanelProvider implements vscode.WebviewViewProvider {
                     apexlog.config.save(message.data, this.context);
                     break;
                 }
+                case "deleteLogs": {
+                    apexlog.explorer.deleteLogs();
+                    break;
+                }
             }
         });
         const config = apexlog.config.get(this.context);
