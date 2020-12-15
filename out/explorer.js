@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getActiveTraceFlag = exports.downloadLog = exports.stopLogging = exports.startLoopingRefresh = exports.startLogging = exports.refreshLogs = exports.getLogUsage = exports.remotelogs = exports.controlpanel = void 0;
+exports.getActiveTraceFlag = exports.deleteLogs = exports.downloadLog = exports.stopLogging = exports.startLoopingRefresh = exports.startLogging = exports.refreshLogs = exports.getLogUsage = exports.remotelogs = exports.controlpanel = void 0;
 const _controlpanel = require("./explorer/controlpanel");
 const _remotelogs = require("./explorer/remotelogs");
 const vscode = require("vscode");
@@ -112,6 +112,38 @@ function downloadLog(logId, context) {
     }));
 }
 exports.downloadLog = downloadLog;
+function deleteLogs() {
+    vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: "Submitting delete job...",
+        cancellable: true,
+    }, (progress, token) => __awaiter(this, void 0, void 0, function* () {
+        return new Promise((resolve, reject) => {
+            apexlog.sfdx
+                .command("force:data:soql:query", ["-q", "SELECT Id FROM ApexLog", "-r", "csv"], false)
+                .then((response) => {
+                fs.writeFileSync(apexlog.config.getWorkspaceFolder() + "/out.csv", response);
+                apexlog.sfdx
+                    .command("force:data:bulk:delete", ["-s", "ApexLog", "-f", "out.csv"])
+                    .then((result) => {
+                    vscode.window.showInformationMessage("Delete job submitted successfully");
+                    resolve(result);
+                })
+                    .catch((error) => {
+                    if (error.message === "Unable to find any data to create batch") {
+                        vscode.window.showInformationMessage("Unable to find any log data to delete.");
+                        resolve();
+                    }
+                    else {
+                        vscode.window.showErrorMessage("Unable to create delete job: " + error.message);
+                        resolve();
+                    }
+                });
+            });
+        });
+    }));
+}
+exports.deleteLogs = deleteLogs;
 function deleteTraceFlag(context) {
     return new Promise((resolve, reject) => {
         const config = apexlog.config.get(context);

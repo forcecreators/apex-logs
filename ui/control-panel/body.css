@@ -28,16 +28,19 @@ html {
     margin-right: -20px;
     height: 100%;
 }
-.btn {
+button {
     background-color: var(--vscode-button-background) !important;
     color: var(--vscode-button-foreground) !important;
     border-radius: 0px !important;
+    border: transparent;
+}
+.btn {
     width: 100% !important;
     margin-bottom: 5px !important;
     height: 27px !important;
     padding-top: 2px !important;
 }
-.btn:hover {
+button:hover {
     background-color: var(--vscode-button-hoverBackground) !important;
     color: var(--vscode-button-foreground) !important;
 }
@@ -74,7 +77,7 @@ input {
     border-radius: 0px !important;
 }
 .progress {
-    width: calc(100% - 80px);
+    width: calc(100% - 108px);
     display: inline-block;
     height: 8px;
 }
@@ -87,4 +90,10 @@ input {
     color: var(--vscode-tab-inactiveForeground) !important;
     border-radius: 0px;
     border-bottom: 2px solid var(--vscode-tab-border) !important;
+}
+.trash {
+    border-radius: 15px !important;
+}
+.trash svg {
+    margin-top: -4px;
 }

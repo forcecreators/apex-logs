@@ -15,8 +15,12 @@ window.addEventListener("message", (event) => {
             break;
         }
         case "logUsage": {
-            console.log("logUsage", message.data);
-            const val = ((parseInt(message.data) / 1000000000) * 100).toFixed(0);
+            let val;
+            if (message.data === null) {
+                val = "0";
+            } else {
+                val = ((parseInt(message.data) / 1000000000) * 100).toFixed(0);
+            }
             console.log("logUsage", val);
             $(".progress-bar")
                 .css("width", val + "%")
@@ -104,4 +108,7 @@ function stopLogging() {
     vscode.postMessage({ type: "stopLogging" });
 }
 
+function deleteLogs() {
+    vscode.postMessage({ type: "deleteLogs" });
+}
 function changeTargetUser() {}
