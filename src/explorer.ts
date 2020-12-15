@@ -126,6 +126,53 @@ export function downloadLog(logId: any, context: vscode.ExtensionContext) {
     );
 }
 
+export function deleteLogs() {
+    vscode.window.withProgress(
+        {
+            location: vscode.ProgressLocation.Notification,
+            title: "Submitting delete job...",
+            cancellable: true,
+        },
+        async (progress, token) => {
+            return new Promise((resolve: any, reject) => {
+                apexlog.sfdx
+                    .command(
+                        "force:data:soql:query",
+                        ["-q", "SELECT Id FROM ApexLog", "-r", "csv"],
+                        false
+                    )
+                    .then((response) => {
+                        fs.writeFileSync(
+                            apexlog.config.getWorkspaceFolder() + "/out.csv",
+                            response
+                        );
+                        apexlog.sfdx
+                            .command("force:data:bulk:delete", ["-s", "ApexLog", "-f", "out.csv"])
+                            .then((result) => {
+                                vscode.window.showInformationMessage(
+                                    "Delete job submitted successfully"
+                                );
+                                resolve(result);
+                            })
+                            .catch((error) => {
+                                if (error.message === "Unable to find any data to create batch") {
+                                    vscode.window.showInformationMessage(
+                                        "Unable to find any log data to delete."
+                                    );
+                                    resolve();
+                                } else {
+                                    vscode.window.showErrorMessage(
+                                        "Unable to create delete job: " + error.message
+                                    );
+                                    resolve();
+                                }
+                            });
+                    });
+            });
+        }
+    );
+}
+
 function deleteTraceFlag(context: vscode.ExtensionContext) {
     return new Promise((resolve: any, reject) => {
         const config: any = apexlog.config.get(context);

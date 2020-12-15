@@ -3,17 +3,22 @@ import { downloadAndUnzipVSCode } from "vscode-test";
 import * as apexlog from "./apexlog";
 import * as vscode from "vscode";
 
-export function command(command: string, args: string[]) {
+export function command(command: string, args: string[], json = true) {
     return new Promise((resolve, reject) => {
         args.unshift(command);
-        args.push("--json");
+        if (json) args.push("--json");
         let ls = cp.spawn("sfdx", args, {
             cwd: apexlog.config.getWorkspaceFolder(),
         });
         ls.stdout.on("data", function (data) {
             let response: any;
             try {
-                response = JSON.parse(data.toString());
+                if (json) {
+                    response = JSON.parse(data.toString());
+                } else {
+                    response = data.toString();
+                    resolve(response);
+                }
             } catch (e) {
                 reject(e.message);
             }
