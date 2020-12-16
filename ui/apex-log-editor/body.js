@@ -41,6 +41,8 @@ window.addEventListener("message", (event) => {
             $(document).ready(function () {
                 $(".rendering").fadeOut();
                 profile = event.data.value;
+                console.log("profile");
+                console.log(profile);
                 if (currentTab) renderTab(currentTab);
             });
             return;

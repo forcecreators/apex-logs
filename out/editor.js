@@ -13,7 +13,6 @@ exports.ApexLogEditorProvider = void 0;
 const vscode = require("vscode");
 const path = require("path");
 const apexlog = require("./apexlog");
-const service_1 = require("./profiler/service");
 class ApexLogEditorProvider {
     constructor(context, diagnosticCollection) {
         this.context = context;
@@ -42,51 +41,38 @@ class ApexLogEditorProvider {
                 changeDocumentSubscription.dispose();
             });
             this.webviewPanel.webview.onDidReceiveMessage((e) => {
-                var _a;
                 switch (e.type) {
                     case "debug":
-                        vscode.commands.executeCommand("sfdx.launch.replay.debugger.logfile", (_a = this.document) === null || _a === void 0 ? void 0 : _a.uri);
+                        vscode.commands.executeCommand("sfdx.launch.replay.debugger.logfile", document.uri);
                         return;
                 }
             });
             const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument((e) => {
                 if (e.document.uri.toString() === document.uri.toString()) {
-                    this.updateWebview();
+                    this.updateWebview(document);
                 }
             });
-            this.updateWebview();
+            this.updateWebview(document);
         });
     }
-    updateWebview() {
-        var _a, _b;
-        return __awaiter(this, void 0, void 0, function* () {
-            (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
-                type: "update",
-                value: (_b = this.document) === null || _b === void 0 ? void 0 : _b.getText(),
-            });
-            if (!this.document)
-                return;
-            const config = apexlog.config.get(this.context);
-            new service_1.ProfileService(this.document.uri.fsPath, config)
-                .on("progress", (value) => {
-                //progress
-            })
-                .on("debug", (value) => {
-                //debug
-            })
-                .run()
-                .then((metadata) => {
-                if (this.document) {
-                    this.diagnosticCollection.set(this.document.uri, this.buildDiagnostics(metadata.diagnostics));
-                }
-                setTimeout(() => {
-                    var _a;
-                    (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
-                        type: "profile",
-                        value: metadata,
-                    });
-                }, 0);
-            });
+    updateWebview(document) {
+        var _a;
+        (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
+            type: "update",
+            value: document.getText(),
+        });
+        const config = apexlog.config.get(this.context);
+        apexlog.profiler.runProfiler(document.uri.fsPath, config).then((metadata) => {
+            if (document) {
+                this.diagnosticCollection.set(document.uri, this.buildDiagnostics(metadata.diagnostics));
+            }
+            setTimeout(() => {
+                var _a;
+                (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
+                    type: "profile",
+                    value: metadata,
+                });
+            }, 0);
         });
     }
     buildDiagnostics(diagnostics) {

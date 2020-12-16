@@ -5,7 +5,11 @@ import { Worker } from "worker_threads";
 
 export function runProfiler(uri: string, config: any) {
     return new Promise((resolve) => {
-        const parser = new Worker(__dirname + "/job.js", { workerData: uri });
+        const data = {
+            uri: uri,
+            config: config,
+        };
+        const parser = new Worker(__dirname + "/job.js", { workerData: data });
         parser.on("message", (message) => {
             switch (message.event) {
                 case "progress":

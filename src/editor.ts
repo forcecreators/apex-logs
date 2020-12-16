@@ -61,7 +61,7 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
                 case "debug":
                     vscode.commands.executeCommand(
                         "sfdx.launch.replay.debugger.logfile",
-                        this.document?.uri
+                        document.uri
                     );
                     return;
             }
@@ -69,42 +69,33 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
 
         const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument((e) => {
             if (e.document.uri.toString() === document.uri.toString()) {
-                this.updateWebview();
+                this.updateWebview(document);
             }
         });
 
-        this.updateWebview();
+        this.updateWebview(document);
     }
 
-    public async updateWebview(): Promise<void> {
+    public updateWebview(document: vscode.TextDocument) {
         this.webviewPanel?.webview.postMessage({
             type: "update",
-            value: this.document?.getText(),
+            value: document.getText(),
         });
-        if (!this.document) return;
         const config = apexlog.config.get(this.context);
-        new ProfileService(this.document.uri.fsPath, config)
-            .on("progress", (value) => {
-                //progress
-            })
-            .on("debug", (value) => {
-                //debug
-            })
-            .run()
-            .then((metadata: any) => {
-                if (this.document) {
-                    this.diagnosticCollection.set(
-                        this.document.uri,
-                        this.buildDiagnostics(metadata.diagnostics)
-                    );
-                }
-                setTimeout(() => {
-                    this.webviewPanel?.webview.postMessage({
-                        type: "profile",
-                        value: metadata,
-                    });
-                }, 0);
-            });
+        apexlog.profiler.runProfiler(document.uri.fsPath, config).then((metadata: any) => {
+            if (document) {
+                this.diagnosticCollection.set(
+                    document.uri,
+                    this.buildDiagnostics(metadata.diagnostics)
+                );
+            }
+            setTimeout(() => {
+                this.webviewPanel?.webview.postMessage({
+                    type: "profile",
+                    value: metadata,
+                });
+            }, 0);
+        });
     }
 
     public buildDiagnostics(diagnostics: any) {

@@ -4,7 +4,11 @@ exports.runProfiler = void 0;
 const worker_threads_1 = require("worker_threads");
 function runProfiler(uri, config) {
     return new Promise((resolve) => {
-        const parser = new worker_threads_1.Worker(__dirname + "/job.js", { workerData: uri });
+        const data = {
+            uri: uri,
+            config: config,
+        };
+        const parser = new worker_threads_1.Worker(__dirname + "/job.js", { workerData: data });
         parser.on("message", (message) => {
             switch (message.event) {
                 case "progress":
