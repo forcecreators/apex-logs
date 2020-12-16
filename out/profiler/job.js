@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const service_1 = require("./service");
 const { workerData, parentPort } = require("worker_threads");
 parentPort.postMessage("starting job with " + workerData);
-new service_1.ProfileService(workerData)
+new service_1.ProfileService(workerData.uri, workerData.config)
     .on("progress", (value) => {
     parentPort.postMessage({
         event: "progress",

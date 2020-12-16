@@ -31,108 +31,230 @@
             &nbsp;
         </div>
     </div>
+    <button class="trash" type="button" onclick="deleteLogs()">
+        <svg
+            width="1em"
+            height="1em"
+            viewBox="0 0 16 16"
+            class="bi bi-trash"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path
+                d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"
+            />
+            <path
+                fill-rule="evenodd"
+                d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+            />
+        </svg>
+    </button>
 </div>
-<div class="field">
-    <h6 class="field-label">Apex Code</h6>
-    <select class="form-control form-control-sm" id="apex">
-        <option>NONE</option>
-        <option>ERROR</option>
-        <option>WARN</option>
-        <option>INFO</option>
-        <option>DEBUG</option>
-        <option>FINE</option>
-        <option>FINER</option>
-        <option>FINEST</option>
-    </select>
-</div>
-<div class="field">
-    <h6 class="field-label">Profiling</h6>
-    <select class="form-control form-control-sm" id="profiling">
-        <option>NONE</option>
-        <option>ERROR</option>
-        <option>WARN</option>
-        <option>INFO</option>
-        <option>DEBUG</option>
-        <option>FINE</option>
-        <option>FINER</option>
-        <option>FINEST</option>
-    </select>
-</div>
-<div class="field">
-    <h6 class="field-label">Callout</h6>
-    <select class="form-control form-control-sm" id="callout">
-        <option>NONE</option>
-        <option>ERROR</option>
-        <option>WARN</option>
-        <option>INFO</option>
-        <option>DEBUG</option>
-        <option>FINE</option>
-        <option>FINER</option>
-        <option>FINEST</option>
-    </select>
-</div>
-<div class="field">
-    <h6 class="field-label">Database</h6>
-    <select class="form-control form-control-sm" id="database">
-        <option>NONE</option>
-        <option>ERROR</option>
-        <option>WARN</option>
-        <option>INFO</option>
-        <option>DEBUG</option>
-        <option>FINE</option>
-        <option>FINER</option>
-        <option>FINEST</option>
-    </select>
-</div>
-<div class="field">
-    <h6 class="field-label">System</h6>
-    <select class="form-control form-control-sm" id="system">
-        <option>NONE</option>
-        <option>ERROR</option>
-        <option>WARN</option>
-        <option>INFO</option>
-        <option>DEBUG</option>
-        <option>FINE</option>
-        <option>FINER</option>
-        <option>FINEST</option>
-    </select>
-</div>
-<div class="field">
-    <h6 class="field-label">Validation</h6>
-    <select class="form-control form-control-sm" id="validation">
-        <option>NONE</option>
-        <option>ERROR</option>
-        <option>WARN</option>
-        <option>INFO</option>
-        <option>DEBUG</option>
-        <option>FINE</option>
-        <option>FINER</option>
-        <option>FINEST</option>
-    </select>
-</div>
-<div class="field">
-    <h6 class="field-label">Visualforce</h6>
-    <select class="form-control form-control-sm" id="visualforce">
-        <option>NONE</option>
-        <option>ERROR</option>
-        <option>WARN</option>
-        <option>INFO</option>
-        <option>DEBUG</option>
-        <option>FINE</option>
-        <option>FINER</option>
-        <option>FINEST</option>
-    </select>
-</div>
-<div class="field">
-    <h6 class="field-label">Workflow</h6>
-    <select class="form-control form-control-sm" id="workflow">
-        <option>NONE</option>
-        <option>ERROR</option>
-        <option>WARN</option>
-        <option>INFO</option>
-        <option>DEBUG</option>
-        <option>FINE</option>
-        <option>FINER</option>
-        <option>FINEST</option>
-    </select>
+
+<nav>
+    <div class="nav nav-pills nav-fill" id="nav-tab" role="tablist">
+        <a
+            class="nav-item nav-link active"
+            id="log-levels-tab"
+            data-toggle="tab"
+            href="#log-levels"
+            role="tab"
+            aria-controls="log-levels"
+            aria-selected="true"
+            >Log Levels</a
+        >
+        <a
+            class="nav-item nav-link"
+            id="profiler-settings-tab"
+            data-toggle="tab"
+            href="#profiler-settings"
+            role="tab"
+            aria-controls="profiler-settings"
+            aria-selected="false"
+            >Profiler Settings</a
+        >
+    </div>
+</nav>
+<br />
+<div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="log-levels" role="tabpanel">
+        <div class="field">
+            <h6 class="field-label">Apex Code</h6>
+            <select class="form-control form-control-sm" id="apex">
+                <option>NONE</option>
+                <option>ERROR</option>
+                <option>WARN</option>
+                <option>INFO</option>
+                <option>DEBUG</option>
+                <option>FINE</option>
+                <option>FINER</option>
+                <option>FINEST</option>
+            </select>
+        </div>
+        <div class="field">
+            <h6 class="field-label">Profiling</h6>
+            <select class="form-control form-control-sm" id="profiling">
+                <option>NONE</option>
+                <option>ERROR</option>
+                <option>WARN</option>
+                <option>INFO</option>
+                <option>DEBUG</option>
+                <option>FINE</option>
+                <option>FINER</option>
+                <option>FINEST</option>
+            </select>
+        </div>
+        <div class="field">
+            <h6 class="field-label">Callout</h6>
+            <select class="form-control form-control-sm" id="callout">
+                <option>NONE</option>
+                <option>ERROR</option>
+                <option>WARN</option>
+                <option>INFO</option>
+                <option>DEBUG</option>
+                <option>FINE</option>
+                <option>FINER</option>
+                <option>FINEST</option>
+            </select>
+        </div>
+        <div class="field">
+            <h6 class="field-label">Database</h6>
+            <select class="form-control form-control-sm" id="database">
+                <option>NONE</option>
+                <option>ERROR</option>
+                <option>WARN</option>
+                <option>INFO</option>
+                <option>DEBUG</option>
+                <option>FINE</option>
+                <option>FINER</option>
+                <option>FINEST</option>
+            </select>
+        </div>
+        <div class="field">
+            <h6 class="field-label">System</h6>
+            <select class="form-control form-control-sm" id="system">
+                <option>NONE</option>
+                <option>ERROR</option>
+                <option>WARN</option>
+                <option>INFO</option>
+                <option>DEBUG</option>
+                <option>FINE</option>
+                <option>FINER</option>
+                <option>FINEST</option>
+            </select>
+        </div>
+        <div class="field">
+            <h6 class="field-label">Validation</h6>
+            <select class="form-control form-control-sm" id="validation">
+                <option>NONE</option>
+                <option>ERROR</option>
+                <option>WARN</option>
+                <option>INFO</option>
+                <option>DEBUG</option>
+                <option>FINE</option>
+                <option>FINER</option>
+                <option>FINEST</option>
+            </select>
+        </div>
+        <div class="field">
+            <h6 class="field-label">Visualforce</h6>
+            <select class="form-control form-control-sm" id="visualforce">
+                <option>NONE</option>
+                <option>ERROR</option>
+                <option>WARN</option>
+                <option>INFO</option>
+                <option>DEBUG</option>
+                <option>FINE</option>
+                <option>FINER</option>
+                <option>FINEST</option>
+            </select>
+        </div>
+        <div class="field">
+            <h6 class="field-label">Workflow</h6>
+            <select class="form-control form-control-sm" id="workflow">
+                <option>NONE</option>
+                <option>ERROR</option>
+                <option>WARN</option>
+                <option>INFO</option>
+                <option>DEBUG</option>
+                <option>FINE</option>
+                <option>FINER</option>
+                <option>FINEST</option>
+            </select>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="profiler-settings" role="tabpanel">
+        <div class="field">
+            <h6 class="field-label">Apex Warn</h6>
+            <input
+                id="apexWarn"
+                type="text"
+                class="form-control form-control-sm"
+                placeholder="Number in milliseconds"
+            />
+        </div>
+        <div class="field">
+            <h6 class="field-label">Apex Error</h6>
+            <input
+                id="apexError"
+                type="text"
+                class="form-control form-control-sm"
+                placeholder="Number in milliseconds"
+            />
+        </div>
+        <div class="field">
+            <h6 class="field-label">SOQL Warn</h6>
+            <input
+                id="soqlWarn"
+                type="text"
+                class="form-control form-control-sm"
+                placeholder="Number in milliseconds"
+            />
+        </div>
+        <div class="field">
+            <h6 class="field-label">SOQL Error</h6>
+            <input
+                id="soqlError"
+                type="text"
+                class="form-control form-control-sm"
+                placeholder="Number in milliseconds"
+            />
+        </div>
+        <div class="field">
+            <h6 class="field-label">DML Warn</h6>
+            <input
+                id="dmlWarn"
+                type="text"
+                class="form-control form-control-sm"
+                placeholder="Number in milliseconds"
+            />
+        </div>
+        <div class="field">
+            <h6 class="field-label">DML Error</h6>
+            <input
+                id="dmlError"
+                type="text"
+                class="form-control form-control-sm"
+                placeholder="Number in milliseconds"
+            />
+        </div>
+        <div class="field">
+            <h6 class="field-label">Workflow Warn</h6>
+            <input
+                id="workflowWarn"
+                type="text"
+                class="form-control form-control-sm"
+                placeholder="Number in milliseconds"
+            />
+        </div>
+        <div class="field">
+            <h6 class="field-label">Workflow Error</h6>
+            <input
+                id="workflowError"
+                type="text"
+                class="form-control form-control-sm"
+                placeholder="Number in milliseconds"
+            />
+        </div>
+    </div>
 </div>

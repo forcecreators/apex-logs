@@ -69,6 +69,12 @@ html {
 .vis-time-axis .vis-grid.vis-minor {
     border: none !important;
 }
+.vis-item-content {
+    padding: 1px 0px 0px 5px !important;
+}
+.vis-item {
+    height: 25px !important;
+}
 .sidenav {
     height: 100%; /* Full-height: remove this if you want "auto" height */
     width: 160px; /* Set the width of the sidebar */
@@ -157,4 +163,17 @@ html {
 .no-data {
     text-align: center;
     color: var(--vscode-editor-foreground);
+}
+.btn {
+    background-color: var(--vscode-button-background) !important;
+    color: var(--vscode-button-foreground) !important;
+    border-radius: 0px !important;
+    width: 100% !important;
+    margin-bottom: 5px !important;
+    height: 27px !important;
+    padding-top: 2px !important;
+}
+.btn:hover {
+    background-color: var(--vscode-button-hoverBackground) !important;
+    color: var(--vscode-button-foreground) !important;
 }

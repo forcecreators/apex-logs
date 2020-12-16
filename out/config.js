@@ -52,7 +52,7 @@ function setup(context) {
             config.defaultUser.username = config.orgs[getDefaultOrg()].username;
             yield getUserId(config, context);
         }
-        const traceFlag = yield apexlog.explorer.getActiveTraceFlag(context);
+        const traceFlag = yield apexlog.explorer.getActiveTraceFlag(config, context);
         if (traceFlag) {
             config.traceFlagId = traceFlag.Id;
             config.endTime = new Date(traceFlag.ExpirationDate).getTime();
@@ -133,9 +133,23 @@ class ExtensionConfig {
         this.orgs = {};
         this.defaultOrg = null;
         this.defaultUser = {};
+        this.profileConfig = new ProfileConfig();
     }
 }
 exports.ExtensionConfig = ExtensionConfig;
+class ProfileConfig {
+    constructor() {
+        this.enabled = true;
+        this.apexWarn = 2000;
+        this.apexError = 5000;
+        this.soqlWarn = 500;
+        this.soqlError = 3000;
+        this.dmlWarn = 3000;
+        this.dmlError = 5000;
+        this.workflowWarn = 500;
+        this.workflowError = 2000;
+    }
+}
 class User {
     constructor() {
         this.id = null;

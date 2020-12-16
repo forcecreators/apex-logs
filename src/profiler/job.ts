@@ -4,7 +4,7 @@ const { workerData, parentPort } = require("worker_threads");
 
 parentPort.postMessage("starting job with " + workerData);
 
-new ProfileService(workerData)
+new ProfileService(workerData.uri, workerData.config)
     .on("progress", (value) => {
         parentPort.postMessage({
             event: "progress",

@@ -14,11 +14,12 @@ const vscode = require("vscode");
 const path = require("path");
 const apexlog = require("./apexlog");
 class ApexLogEditorProvider {
-    constructor(context) {
+    constructor(context, diagnosticCollection) {
         this.context = context;
+        this.diagnosticCollection = diagnosticCollection;
     }
-    static register(context) {
-        const provider = new ApexLogEditorProvider(context);
+    static register(context, diagnosticCollection) {
+        const provider = new ApexLogEditorProvider(context, diagnosticCollection);
         const providerRegistration = vscode.window.registerCustomEditorProvider(ApexLogEditorProvider.viewType, provider, {
             webviewOptions: {
                 retainContextWhenHidden: true,
@@ -28,46 +29,61 @@ class ApexLogEditorProvider {
     }
     resolveCustomTextEditor(document, webviewPanel, _token) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Setup initial content for the webview
-            webviewPanel.webview.options = {
+            this.webviewPanel = webviewPanel;
+            this.document = document;
+            this.webviewPanel.webview.options = {
                 enableScripts: true,
                 localResourceRoots: [vscode.Uri.file(path.join(this.context.extensionPath, "ui"))],
             };
-            webviewPanel;
-            webviewPanel.webview.html = apexlog.ui.getWebviewContent("apex-log-editor", webviewPanel.webview, this.context);
-            function updateWebview() {
-                webviewPanel.webview.postMessage({
-                    type: "update",
-                    value: document.getText(),
-                });
-                apexlog.profiler.runProfiler(document.uri.fsPath).then((metadata) => {
-                    console.log("got metadata!!!!");
-                    console.log(metadata);
-                    setTimeout(() => {
-                        webviewPanel.webview.postMessage({
-                            type: "profile",
-                            value: metadata,
-                        });
-                    }, 3000);
-                });
-            }
-            const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument((e) => {
-                if (e.document.uri.toString() === document.uri.toString()) {
-                    updateWebview();
-                }
-            });
-            webviewPanel.onDidDispose(() => {
+            this.webviewPanel.webview.html = apexlog.ui.getWebviewContent("apex-log-editor", this.webviewPanel.webview, this.context);
+            this.webviewPanel.onDidDispose(() => {
+                this.diagnosticCollection.delete(document.uri);
                 changeDocumentSubscription.dispose();
             });
-            webviewPanel.webview.onDidReceiveMessage((e) => {
+            this.webviewPanel.webview.onDidReceiveMessage((e) => {
+                var _a;
                 switch (e.type) {
                     case "debug":
-                        //todo: wire up button to apex replay debugger
-                        return;
+                        vscode.commands.executeCommand("sfdx.launch.replay.debugger.logfile", document.uri);
+                        break;
+                    case "ready":
+                        (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
+                            type: "update",
+                            value: document.getText(),
+                        });
+                        break;
                 }
             });
-            updateWebview();
+            const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument((e) => {
+                if (e.document.uri.toString() === document.uri.toString()) {
+                    this.updateWebview(document);
+                }
+            });
+            this.updateWebview(document);
         });
+    }
+    updateWebview(document) {
+        const config = apexlog.config.get(this.context);
+        apexlog.profiler.runProfiler(document.uri.fsPath, config).then((metadata) => {
+            if (document) {
+                this.diagnosticCollection.set(document.uri, this.buildDiagnostics(metadata.diagnostics));
+            }
+            setTimeout(() => {
+                var _a;
+                metadata.raw = document.getText();
+                (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
+                    type: "profile",
+                    value: metadata,
+                });
+            }, 0);
+        });
+    }
+    buildDiagnostics(diagnostics) {
+        const results = [];
+        diagnostics.forEach((diagnosticItem) => {
+            results.push(new vscode.Diagnostic(new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0)), diagnosticItem.message, diagnosticItem.severity));
+        });
+        return results;
     }
 }
 exports.ApexLogEditorProvider = ApexLogEditorProvider;

@@ -3,10 +3,14 @@ import * as path from "path";
 import * as fs from "fs";
 import { Worker } from "worker_threads";
 import * as apexlog from "./apexlog";
+import { ProfileService } from "./profiler/service";
 
 export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
-    public static register(context: vscode.ExtensionContext): vscode.Disposable {
-        const provider = new ApexLogEditorProvider(context);
+    public static register(
+        context: vscode.ExtensionContext,
+        diagnosticCollection: vscode.DiagnosticCollection
+    ): vscode.Disposable {
+        const provider = new ApexLogEditorProvider(context, diagnosticCollection);
         const providerRegistration = vscode.window.registerCustomEditorProvider(
             ApexLogEditorProvider.viewType,
             provider,
@@ -20,61 +24,94 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
     }
 
     private static readonly viewType = "forcecreators.apexlogs.editor";
+    private webviewPanel: vscode.WebviewPanel | undefined;
+    private document: vscode.TextDocument | undefined;
 
-    constructor(private readonly context: vscode.ExtensionContext) {}
+    constructor(
+        private readonly context: vscode.ExtensionContext,
+        private readonly diagnosticCollection: vscode.DiagnosticCollection
+    ) {}
 
     public async resolveCustomTextEditor(
         document: vscode.TextDocument,
         webviewPanel: vscode.WebviewPanel,
         _token: vscode.CancellationToken
     ): Promise<void> {
-        // Setup initial content for the webview
-        webviewPanel.webview.options = {
+        this.webviewPanel = webviewPanel;
+        this.document = document;
+
+        this.webviewPanel.webview.options = {
             enableScripts: true,
             localResourceRoots: [vscode.Uri.file(path.join(this.context.extensionPath, "ui"))],
         };
-        webviewPanel;
-        webviewPanel.webview.html = apexlog.ui.getWebviewContent(
+
+        this.webviewPanel.webview.html = apexlog.ui.getWebviewContent(
             "apex-log-editor",
-            webviewPanel.webview,
+            this.webviewPanel.webview,
             this.context
         );
 
-        function updateWebview() {
-            webviewPanel.webview.postMessage({
-                type: "update",
-                value: document.getText(),
-            });
-            apexlog.profiler.runProfiler(document.uri.fsPath).then((metadata) => {
-                console.log("got metadata!!!!");
-                console.log(metadata);
-                setTimeout(() => {
-                    webviewPanel.webview.postMessage({
-                        type: "profile",
-                        value: metadata,
-                    });
-                }, 3000);
-            });
-        }
-
-        const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument((e) => {
-            if (e.document.uri.toString() === document.uri.toString()) {
-                updateWebview();
-            }
-        });
-
-        webviewPanel.onDidDispose(() => {
+        this.webviewPanel.onDidDispose(() => {
+            this.diagnosticCollection.delete(document.uri);
             changeDocumentSubscription.dispose();
         });
 
-        webviewPanel.webview.onDidReceiveMessage((e) => {
+        this.webviewPanel.webview.onDidReceiveMessage((e) => {
             switch (e.type) {
                 case "debug":
-                    //todo: wire up button to apex replay debugger
-                    return;
+                    vscode.commands.executeCommand(
+                        "sfdx.launch.replay.debugger.logfile",
+                        document.uri
+                    );
+                    break;
+                case "ready":
+                    this.webviewPanel?.webview.postMessage({
+                        type: "update",
+                        value: document.getText(),
+                    });
+                    break;
             }
         });
 
-        updateWebview();
+        const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument((e) => {
+            if (e.document.uri.toString() === document.uri.toString()) {
+                this.updateWebview(document);
+            }
+        });
+
+        this.updateWebview(document);
+    }
+
+    public updateWebview(document: vscode.TextDocument) {
+        const config = apexlog.config.get(this.context);
+        apexlog.profiler.runProfiler(document.uri.fsPath, config).then((metadata: any) => {
+            if (document) {
+                this.diagnosticCollection.set(
+                    document.uri,
+                    this.buildDiagnostics(metadata.diagnostics)
+                );
+            }
+            setTimeout(() => {
+                metadata.raw = document.getText();
+                this.webviewPanel?.webview.postMessage({
+                    type: "profile",
+                    value: metadata,
+                });
+            }, 0);
+        });
+    }
+
+    public buildDiagnostics(diagnostics: any) {
+        const results: any = [];
+        diagnostics.forEach((diagnosticItem: any) => {
+            results.push(
+                new vscode.Diagnostic(
+                    new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0)),
+                    diagnosticItem.message,
+                    diagnosticItem.severity
+                )
+            );
+        });
+        return results;
     }
 }

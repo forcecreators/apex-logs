@@ -126,6 +126,61 @@ export function downloadLog(logId: any, context: vscode.ExtensionContext) {
     );
 }
 
+export async function deleteLogs() {
+    const confim = await vscode.window.showWarningMessage(
+        "Are you sure you want to delete logs? This will delete all of the logs in your org.",
+        { modal: true },
+        "Yes"
+    );
+    if (confim !== "Yes") return;
+    vscode.window.withProgress(
+        {
+            location: vscode.ProgressLocation.Notification,
+            title: "Async Log Delete Job",
+            cancellable: false,
+        },
+        async (progress, token) => {
+            return new Promise((resolve: any, reject) => {
+                progress.report({ message: "Querying for logs to delete..." });
+                apexlog.sfdx
+                    .command(
+                        "force:data:soql:query",
+                        ["-q", "SELECT Id FROM ApexLog", "-r", "csv"],
+                        false
+                    )
+                    .then((response) => {
+                        fs.writeFileSync(
+                            apexlog.config.getWorkspaceFolder() + "/out.csv",
+                            response
+                        );
+                        progress.report({ message: "Requesting bulk deletion of logs..." });
+                        apexlog.sfdx
+                            .command("force:data:bulk:delete", ["-s", "ApexLog", "-f", "out.csv"])
+                            .then((result) => {
+                                vscode.window.showInformationMessage(
+                                    "Request to delete logs sent successfully, it may take a few moments for your logs to be deleted."
+                                );
+                                resolve(result);
+                            })
+                            .catch((error) => {
+                                if (error.message === "Unable to find any data to create batch") {
+                                    vscode.window.showInformationMessage(
+                                        "Logs are already empty, nothing to delete."
+                                    );
+                                    resolve();
+                                } else {
+                                    vscode.window.showErrorMessage(
+                                        "Unable to create delete job: " + error.message
+                                    );
+                                    resolve();
+                                }
+                            });
+                    });
+            });
+        }
+    );
+}
+
 function deleteTraceFlag(context: vscode.ExtensionContext) {
     return new Promise((resolve: any, reject) => {
         const config: any = apexlog.config.get(context);
@@ -149,9 +204,8 @@ function deleteTraceFlag(context: vscode.ExtensionContext) {
     });
 }
 
-export function getActiveTraceFlag(context: vscode.ExtensionContext) {
+export function getActiveTraceFlag(config: any, context: vscode.ExtensionContext) {
     return new Promise((resolve, reject) => {
-        const config = apexlog.config.get(context);
         apexlog.sfdx
             .command("force:data:soql:query", [
                 "-t",

@@ -19,8 +19,9 @@ function nanoToMili(nanoSeconds) {
     return Math.floor(nanoSeconds / 1000000);
 }
 class ApexLog extends events.EventEmitter {
-    constructor(logpath) {
+    constructor(logpath, config) {
         super();
+        this.diagnostics = [];
         this.logpath = logpath;
         this.startTime = null;
         this.currentIndex = 0;
@@ -29,6 +30,7 @@ class ApexLog extends events.EventEmitter {
         this.parents = [];
         this.lines = {};
         this.limits = {};
+        this.config = config;
     }
     processLog() {
         return new Promise((resolve) => {
@@ -45,6 +47,7 @@ class ApexLog extends events.EventEmitter {
                 this.processLine(line);
                 this.reportProgess();
             }
+            this.buildLimitsDiagnostics();
             console.log("metadata", this);
             resolve(this);
         });
@@ -90,6 +93,14 @@ class ApexLog extends events.EventEmitter {
     }
     getCurrentIndex() {
         return this.currentIndex;
+    }
+    buildLimitsDiagnostics() {
+        Object.keys(this.limits).forEach((key) => {
+            const limits = this.limits[key];
+            const limit = limits[limits.length - 1];
+            const message = `LIMIT ${key}: ${limit.limitCurrent}/${limit.limitMax}`;
+            this.diagnostics.push(new DiagnosticItem(2, message, limit));
+        });
     }
     reportProgess() {
         const progress = Math.floor((this.currentIndex / this.totalLines) * 100);
@@ -166,7 +177,49 @@ class ApexLogLine {
         }
         this.endTime = new Date(context.startTime + nanoToMili(endline.nano));
         this.totalTime = nanoToMili(endline.nano - this.nano);
+        if (this.type === "dml" &&
+            this.totalTime >= context.config.profileConfig.dmlWarn &&
+            this.totalTime < context.config.profileConfig.dmlError) {
+            context.diagnostics.push(new DiagnosticItem(1, `Long Running DML (${this.totalTime}ms): ${this.detail}`, this));
+        }
+        else if (this.type === "dml" && this.totalTime >= context.config.profileConfig.dmlError) {
+            context.diagnostics.push(new DiagnosticItem(0, `Long Running DML (${this.totalTime}ms): ${this.detail}`, this));
+        }
+        else if (this.type === "soql" &&
+            this.totalTime >= context.config.profileConfig.soqlWarn &&
+            this.totalTime < context.config.profileConfig.soqlError) {
+            context.diagnostics.push(new DiagnosticItem(1, `Long Running SOQL (${this.totalTime}ms): ${this.detail}`, this));
+        }
+        else if (this.type === "soql" &&
+            this.totalTime >= context.config.profileConfig.soqlError) {
+            context.diagnostics.push(new DiagnosticItem(0, `Long Running SOQL (${this.totalTime}ms): ${this.detail}`, this));
+        }
+        else if (this.type === "apex" &&
+            this.totalTime >= context.config.profileConfig.apexWarn &&
+            this.totalTime < context.config.profileConfig.apexError) {
+            context.diagnostics.push(new DiagnosticItem(1, `Long Running Apex (${this.totalTime}ms): ${this.detail}`, this));
+        }
+        else if (this.type === "apex" &&
+            this.totalTime >= context.config.profileConfig.apexError) {
+            context.diagnostics.push(new DiagnosticItem(0, `Long Running Apex (${this.totalTime}ms): ${this.detail}`, this));
+        }
+        else if (this.type === "workflow" &&
+            this.totalTime >= context.config.profileConfig.workflowWarn &&
+            this.totalTime < context.config.profileConfig.workflowError) {
+            context.diagnostics.push(new DiagnosticItem(1, `Long Running Workflow (${this.totalTime}ms): ${this.detail}`, this));
+        }
+        else if (this.type === "workflow" &&
+            this.totalTime >= context.config.profileConfig.workflowError) {
+            context.diagnostics.push(new DiagnosticItem(0, `Long Running Workflow (${this.totalTime}ms): ${this.detail}`, this));
+        }
     }
 }
 exports.ApexLogLine = ApexLogLine;
+class DiagnosticItem {
+    constructor(severity, message, line) {
+        this.severity = severity;
+        this.message = message;
+        this.line = line;
+    }
+}
 //# sourceMappingURL=models.js.map

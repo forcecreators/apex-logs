@@ -15,8 +15,12 @@ window.addEventListener("message", (event) => {
             break;
         }
         case "logUsage": {
-            console.log("logUsage", message.data);
-            const val = ((parseInt(message.data) / 1000000000) * 100).toFixed(0);
+            let val;
+            if (message.data === null) {
+                val = "0";
+            } else {
+                val = ((parseInt(message.data) / 1000000000) * 100).toFixed(0);
+            }
             console.log("logUsage", val);
             $(".progress-bar")
                 .css("width", val + "%")
@@ -53,6 +57,14 @@ function updateConfig() {
     config.validation = $("#validation").val();
     config.visualforce = $("#visualforce").val();
     config.workflow = $("#workflow").val();
+    config.profileConfig.apexWarn = $("#apexWarn").val();
+    config.profileConfig.apexError = $("#apexError").val();
+    config.profileConfig.soqlWarn = $("#soqlWarn").val();
+    config.profileConfig.soqlError = $("#soqlError").val();
+    config.profileConfig.dmlWarn = $("#dmlWarn").val();
+    config.profileConfig.dmlError = $("#dmlError").val();
+    config.profileConfig.workflowWarn = $("#workflowWarn").val();
+    config.profileConfig.workflowError = $("#workflowError").val();
     vscode.postMessage({ type: "config", data: config });
 }
 
@@ -65,6 +77,14 @@ function refreshUI() {
     $("#validation").val(config.validation);
     $("#visualforce").val(config.visualforce);
     $("#workflow").val(config.workflow);
+    $("#apexWarn").val(config.profileConfig.apexWarn);
+    $("#apexError").val(config.profileConfig.apexError);
+    $("#soqlWarn").val(config.profileConfig.soqlWarn);
+    $("#soqlError").val(config.profileConfig.soqlError);
+    $("#dmlWarn").val(config.profileConfig.dmlWarn);
+    $("#dmlError").val(config.profileConfig.dmlError);
+    $("#workflowWarn").val(config.profileConfig.workflowWarn);
+    $("#workflowError").val(config.profileConfig.workflowError);
     if (config.endTime && new Date(config.endTime) > new Date()) {
         $(".startLoggingButton").hide();
         $(".pendingButton").hide();
@@ -88,4 +108,7 @@ function stopLogging() {
     vscode.postMessage({ type: "stopLogging" });
 }
 
+function deleteLogs() {
+    vscode.postMessage({ type: "deleteLogs" });
+}
 function changeTargetUser() {}

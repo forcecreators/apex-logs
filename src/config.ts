@@ -43,7 +43,7 @@ export async function setup(context: vscode.ExtensionContext) {
         config.defaultUser.username = config.orgs[getDefaultOrg()].username;
         await getUserId(config, context);
     }
-    const traceFlag: any = await apexlog.explorer.getActiveTraceFlag(context);
+    const traceFlag: any = await apexlog.explorer.getActiveTraceFlag(config, context);
     if (traceFlag) {
         config.traceFlagId = traceFlag.Id;
         config.endTime = new Date(traceFlag.ExpirationDate).getTime();
@@ -125,6 +125,19 @@ export class ExtensionConfig {
     public orgs: any | null = {};
     public defaultOrg: string | null = null;
     public defaultUser: any = {};
+    public profileConfig = new ProfileConfig();
+}
+
+class ProfileConfig {
+    public enabled = true;
+    public apexWarn = 2000;
+    public apexError = 5000;
+    public soqlWarn = 500;
+    public soqlError = 3000;
+    public dmlWarn = 3000;
+    public dmlError = 5000;
+    public workflowWarn = 500;
+    public workflowError = 2000;
 }
 
 class User {

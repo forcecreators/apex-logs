@@ -2,6 +2,20 @@
 
 All notable changes to the "apex-logs" extension will be documented in this file.
 
+### 0.2.3
+
+Note: Extension out of preview!
+
+Feature: See profiling results in VSCodes "Problems" panel when opening logs. Developers can set customizable thresholds for alerts.
+
+Feature: Kick off the Apex Replay Debugger directly from Apex Logs
+
+Feature: Delete all logs in an org.
+
+Enhancement: Decreased the size of elements in visual stack trace.
+
+Bug Fix: Editor shows multiple active items when clicking a limits tab.
+
 ### 0.1.4
 
 Bug Fix: Process builders show up under the "other" tab in "executed units" #20
