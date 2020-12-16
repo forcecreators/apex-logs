@@ -41,10 +41,17 @@ class ApexLogEditorProvider {
                 changeDocumentSubscription.dispose();
             });
             this.webviewPanel.webview.onDidReceiveMessage((e) => {
+                var _a;
                 switch (e.type) {
                     case "debug":
                         vscode.commands.executeCommand("sfdx.launch.replay.debugger.logfile", document.uri);
-                        return;
+                        break;
+                    case "ready":
+                        (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
+                            type: "update",
+                            value: document.getText(),
+                        });
+                        break;
                 }
             });
             const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument((e) => {
@@ -56,11 +63,6 @@ class ApexLogEditorProvider {
         });
     }
     updateWebview(document) {
-        var _a;
-        (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
-            type: "update",
-            value: document.getText(),
-        });
         const config = apexlog.config.get(this.context);
         apexlog.profiler.runProfiler(document.uri.fsPath, config).then((metadata) => {
             if (document) {
@@ -68,6 +70,7 @@ class ApexLogEditorProvider {
             }
             setTimeout(() => {
                 var _a;
+                metadata.raw = document.getText();
                 (_a = this.webviewPanel) === null || _a === void 0 ? void 0 : _a.webview.postMessage({
                     type: "profile",
                     value: metadata,

@@ -24,6 +24,10 @@ const timelineOptions = {
     showMinorLabels: false,
 };
 
+$(document).ready(function () {
+    vscode.postMessage({ type: "ready" });
+});
+
 window.addEventListener("message", (event) => {
     switch (event.data.type) {
         case "update":

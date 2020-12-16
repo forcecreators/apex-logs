@@ -63,7 +63,13 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
                         "sfdx.launch.replay.debugger.logfile",
                         document.uri
                     );
-                    return;
+                    break;
+                case "ready":
+                    this.webviewPanel?.webview.postMessage({
+                        type: "update",
+                        value: document.getText(),
+                    });
+                    break;
             }
         });
 
@@ -77,10 +83,6 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
     }
 
     public updateWebview(document: vscode.TextDocument) {
-        this.webviewPanel?.webview.postMessage({
-            type: "update",
-            value: document.getText(),
-        });
         const config = apexlog.config.get(this.context);
         apexlog.profiler.runProfiler(document.uri.fsPath, config).then((metadata: any) => {
             if (document) {
@@ -90,6 +92,7 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
                 );
             }
             setTimeout(() => {
+                metadata.raw = document.getText();
                 this.webviewPanel?.webview.postMessage({
                     type: "profile",
                     value: metadata,
