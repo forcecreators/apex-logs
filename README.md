@@ -22,7 +22,7 @@ Start profiling your Salesforce ORGs performance directly in VSCode! Quickly ide
 
 ## Release Notes
 
-### 0.2.1
+### 0.2.2
 
 Note: Extension out of preview!
 
