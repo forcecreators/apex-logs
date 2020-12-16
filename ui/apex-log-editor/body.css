@@ -69,6 +69,12 @@ html {
 .vis-time-axis .vis-grid.vis-minor {
     border: none !important;
 }
+.vis-item-content {
+    padding: 1px 0px 0px 5px !important;
+}
+.vis-item {
+    height: 25px !important;
+}
 .sidenav {
     height: 100%; /* Full-height: remove this if you want "auto" height */
     width: 160px; /* Set the width of the sidebar */
