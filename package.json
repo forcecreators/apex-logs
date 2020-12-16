@@ -2,10 +2,10 @@
 	"name": "apex-logs",
 	"displayName": "Apex Logs - Salesforce Performance Profiler",
 	"description": "Salesforce performance profiling directly in VSCode. Quickly and easily identify performance bottlenecks.",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"publisher": "forcecreators",
 	"license": "MIT License",
-	"preview": true,
+	"preview": false,
 	"icon": "ui/media/ApexLogs.jpeg",
 	"repository": {
 		"type": "git",
