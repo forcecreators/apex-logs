@@ -76,7 +76,7 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
         this.updateWebview();
     }
 
-    public async updateWebview(): void {
+    public async updateWebview(): Promise<void> {
         this.webviewPanel?.webview.postMessage({
             type: "update",
             value: this.document?.getText(),
