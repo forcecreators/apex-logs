@@ -6,8 +6,11 @@ import * as apexlog from "./apexlog";
 import { ProfileService } from "./profiler/service";
 
 export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
-    public static register(context: vscode.ExtensionContext): vscode.Disposable {
-        const provider = new ApexLogEditorProvider(context);
+    public static register(
+        context: vscode.ExtensionContext,
+        diagnosticCollection: vscode.DiagnosticCollection
+    ): vscode.Disposable {
+        const provider = new ApexLogEditorProvider(context, diagnosticCollection);
         const providerRegistration = vscode.window.registerCustomEditorProvider(
             ApexLogEditorProvider.viewType,
             provider,
@@ -21,11 +24,13 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
     }
 
     private static readonly viewType = "forcecreators.apexlogs.editor";
-    private diagnosticCollection: vscode.DiagnosticCollection | undefined;
     private webviewPanel: vscode.WebviewPanel | undefined;
     private document: vscode.TextDocument | undefined;
 
-    constructor(private readonly context: vscode.ExtensionContext) {}
+    constructor(
+        private readonly context: vscode.ExtensionContext,
+        private readonly diagnosticCollection: vscode.DiagnosticCollection
+    ) {}
 
     public async resolveCustomTextEditor(
         document: vscode.TextDocument,
@@ -34,7 +39,6 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
     ): Promise<void> {
         this.webviewPanel = webviewPanel;
         this.document = document;
-        this.diagnosticCollection = vscode.languages.createDiagnosticCollection("ApexLog");
 
         this.webviewPanel.webview.options = {
             enableScripts: true,
@@ -48,8 +52,8 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
         );
 
         this.webviewPanel.onDidDispose(() => {
+            this.diagnosticCollection.delete(document.uri);
             changeDocumentSubscription.dispose();
-            this.diagnosticCollection?.clear();
         });
 
         this.webviewPanel.webview.onDidReceiveMessage((e) => {
@@ -89,7 +93,7 @@ export class ApexLogEditorProvider implements vscode.CustomTextEditorProvider {
             .run()
             .then((metadata: any) => {
                 if (this.document) {
-                    this.diagnosticCollection?.set(
+                    this.diagnosticCollection.set(
                         this.document.uri,
                         this.buildDiagnostics(metadata.diagnostics)
                     );

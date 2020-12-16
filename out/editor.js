@@ -15,11 +15,12 @@ const path = require("path");
 const apexlog = require("./apexlog");
 const service_1 = require("./profiler/service");
 class ApexLogEditorProvider {
-    constructor(context) {
+    constructor(context, diagnosticCollection) {
         this.context = context;
+        this.diagnosticCollection = diagnosticCollection;
     }
-    static register(context) {
-        const provider = new ApexLogEditorProvider(context);
+    static register(context, diagnosticCollection) {
+        const provider = new ApexLogEditorProvider(context, diagnosticCollection);
         const providerRegistration = vscode.window.registerCustomEditorProvider(ApexLogEditorProvider.viewType, provider, {
             webviewOptions: {
                 retainContextWhenHidden: true,
@@ -31,16 +32,14 @@ class ApexLogEditorProvider {
         return __awaiter(this, void 0, void 0, function* () {
             this.webviewPanel = webviewPanel;
             this.document = document;
-            this.diagnosticCollection = vscode.languages.createDiagnosticCollection("ApexLog");
             this.webviewPanel.webview.options = {
                 enableScripts: true,
                 localResourceRoots: [vscode.Uri.file(path.join(this.context.extensionPath, "ui"))],
             };
             this.webviewPanel.webview.html = apexlog.ui.getWebviewContent("apex-log-editor", this.webviewPanel.webview, this.context);
             this.webviewPanel.onDidDispose(() => {
-                var _a;
+                this.diagnosticCollection.delete(document.uri);
                 changeDocumentSubscription.dispose();
-                (_a = this.diagnosticCollection) === null || _a === void 0 ? void 0 : _a.clear();
             });
             this.webviewPanel.webview.onDidReceiveMessage((e) => {
                 var _a;
@@ -77,9 +76,8 @@ class ApexLogEditorProvider {
             })
                 .run()
                 .then((metadata) => {
-                var _a;
                 if (this.document) {
-                    (_a = this.diagnosticCollection) === null || _a === void 0 ? void 0 : _a.set(this.document.uri, this.buildDiagnostics(metadata.diagnostics));
+                    this.diagnosticCollection.set(this.document.uri, this.buildDiagnostics(metadata.diagnostics));
                 }
                 setTimeout(() => {
                     var _a;
