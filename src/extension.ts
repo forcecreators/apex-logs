@@ -6,7 +6,8 @@ import * as apexlog from "./apexlog";
 export async function activate(context: vscode.ExtensionContext) {
     await apexlog.config.setup(context);
     apexlog.registerCommands(context);
-    apexlog.editor.ApexLogEditorProvider.register(context);
+    const diagnosticCollection = vscode.languages.createDiagnosticCollection("ApexLog");
+    apexlog.editor.ApexLogEditorProvider.register(context, diagnosticCollection);
     apexlog.explorer.remotelogs.RemoteLogsProvider.register(context);
     apexlog.explorer.controlpanel.ControlPanelProvider.register(context);
 }
