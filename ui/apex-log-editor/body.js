@@ -50,6 +50,8 @@ window.addEventListener("message", (event) => {
 $("#nav-tab a").on("click", function (e) {
     e.preventDefault();
     currentTab = $(this).attr("id");
+    console.log(currentTab);
+    if (currentTab !== "limits-tab") $(".active").removeClass("active");
     if (profile) renderTab(currentTab);
 });
 
