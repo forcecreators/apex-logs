@@ -11,14 +11,18 @@ function command(command, args, json = true) {
         let ls = cp.spawn("sfdx", args, {
             cwd: apexlog.config.getWorkspaceFolder(),
         });
+        let raw = "";
         ls.stdout.on("data", function (data) {
-            let response;
+            raw += data;
+        });
+        ls.stdout.on("close", () => {
+            let response = raw;
             try {
                 if (json) {
-                    response = JSON.parse(data.toString());
+                    response = JSON.parse(raw.toString());
                 }
                 else {
-                    response = data.toString();
+                    response = raw.toString();
                     resolve(response);
                 }
             }
