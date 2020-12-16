@@ -2,7 +2,7 @@
 
 All notable changes to the "apex-logs" extension will be documented in this file.
 
-### 0.2.2
+### 0.2.3
 
 Note: Extension out of preview!
 
