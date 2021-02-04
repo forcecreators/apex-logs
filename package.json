@@ -2,7 +2,7 @@
 	"name": "apex-logs",
 	"displayName": "Apex Logs - Salesforce Performance Profiler",
 	"description": "Salesforce performance profiling directly in VSCode. Quickly and easily identify performance bottlenecks.",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"publisher": "forcecreators",
 	"license": "MIT License",
 	"preview": false,
@@ -94,7 +94,18 @@
 				],
 				"priority": "default"
 			}
-		]
+		],
+		"configuration": {
+			"title": "Salesforce Performance Profiler",
+			"properties": {
+			  "forcecreators.apexlogs.bypassLogExplorer": {
+				"type": "boolean",
+				"scope": "resource",
+				"default": false,
+				"description": "Prevents users having difficulty loading the extension to bypass the log explorer feature."
+			  }
+			}
+		  }
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

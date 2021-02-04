@@ -2,6 +2,12 @@
 
 All notable changes to the "apex-logs" extension will be documented in this file.
 
+### 0.2.4
+
+Announcement: Log Explorer will be moving to its own extension on 2/6/21. Log Explorer will be removed from Apex Logs starting 2/12/21. For more information see https://github.com/forcecreators/apex-logs/issues/41
+
+Work Around: In issue 41 we discuss a bug where some users extension may not load correctly. Users affected by this bug can navigate to the VSCode settings, search for "bypass log explorer", and set it to `true` to avoid this problem.
+
 ### 0.2.3
 
 Note: Extension out of preview!
