@@ -14,12 +14,15 @@ const vscode = require("vscode");
 const apexlog = require("./apexlog");
 function activate(context) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield apexlog.config.setup(context);
-        apexlog.registerCommands(context);
+        const configuration = vscode.workspace.getConfiguration("forcecreators.apexlogs");
+        if (!configuration.bypassLogExplorer) {
+            yield apexlog.config.setup(context);
+            apexlog.registerCommands(context);
+            apexlog.explorer.remotelogs.RemoteLogsProvider.register(context);
+            apexlog.explorer.controlpanel.ControlPanelProvider.register(context);
+        }
         const diagnosticCollection = vscode.languages.createDiagnosticCollection("ApexLog");
         apexlog.editor.ApexLogEditorProvider.register(context, diagnosticCollection);
-        apexlog.explorer.remotelogs.RemoteLogsProvider.register(context);
-        apexlog.explorer.controlpanel.ControlPanelProvider.register(context);
     });
 }
 exports.activate = activate;

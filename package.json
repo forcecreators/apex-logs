@@ -94,7 +94,18 @@
 				],
 				"priority": "default"
 			}
-		]
+		],
+		"configuration": {
+			"title": "Salesforce Performance Profiler",
+			"properties": {
+			  "forcecreators.apexlogs.bypassLogExplorer": {
+				"type": "boolean",
+				"scope": "resource",
+				"default": false,
+				"description": "Prevents users having difficulty loading the extension to bypass the log explorer feature."
+			  }
+			}
+		  }
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
